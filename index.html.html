@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travel Agency Accounting System v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1a2e;--paper:#f5f0e8;--pw:#ede7d9;--pc:#faf7f2;
+  --gold:#c9a84c;--gl:#e8c97a;--gd:#a8873a;
+  --teal:#2a6b7c;--tl:#3d8fa3;
+  --red:#b84040;--rl:#d45c5c;
+  --grn:#3a7a5a;--grl:#4d9a72;
+  --pur:#6a4c93;
+  --bdr:#d4c9b0;--shd:rgba(26,26,46,.12);
+  --fs:'Playfair Display',serif;--fn:'Inter',sans-serif;--fm:'IBM Plex Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--fn);font-size:14px;min-height:100vh}
+.app{display:flex;min-height:100vh}
+.sidebar{width:232px;min-width:232px;background:var(--ink);color:#ccc;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+.sb-logo{padding:18px 16px 14px;border-bottom:1px solid rgba(201,168,76,.3)}
+.sb-logo h1{font-family:var(--fs);font-size:15px;color:var(--gold);line-height:1.4;font-weight:600}
+.sb-logo p{font-size:10px;color:#666;margin-top:3px;font-family:var(--fm)}
+.ns{padding:10px 0 2px}
+.nl{font-size:10px;letter-spacing:1.5px;color:#555;padding:0 16px;text-transform:uppercase;margin-bottom:3px;font-family:var(--fm)}
+.ni{display:flex;align-items:center;gap:7px;padding:8px 16px;cursor:pointer;transition:all .13s;font-size:12.5px;color:#bbb;border-left:3px solid transparent;white-space:nowrap}
+.ni:hover{background:rgba(255,255,255,.05);color:#eee}
+.ni.active{background:rgba(201,168,76,.12);color:var(--gold);border-left-color:var(--gold)}
+.mn{flex:1;display:flex;flex-direction:column;min-height:100vh;min-width:0}
+.tb{background:var(--pc);border-bottom:1px solid var(--bdr);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;}
+.tb h2{font-family:var(--fs);font-size:17px;font-weight:600}
+.tba{display:flex;gap:8px;align-items:center}
+.ct{padding:20px 24px;flex:1}
+.view{display:none}.view.active{display:block}
+.sg{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:18px}
+.sc{background:var(--pc);border:1px solid var(--bdr);border-radius:6px;padding:13px 15px}
+.sc .lb{font-size:10px;color:#888;letter-spacing:.4px;margin-bottom:4px;font-family:var(--fm)}
+.sc .vl{font-family:var(--fm);font-size:18px;font-weight:500}
+.sc .sb2{font-size:10px;color:#999;margin-top:2px}
+.sc.gold{border-top:3px solid var(--gold)}.sc.teal{border-top:3px solid var(--teal)}
+.sc.red{border-top:3px solid var(--red)}.sc.grn{border-top:3px solid var(--grn)}.sc.pur{border-top:3px solid var(--pur)}
+.btn{padding:7px 14px;border-radius:4px;border:none;cursor:pointer;font-size:13px;font-family:var(--fn);font-weight:500;transition:all .13s;display:inline-flex;align-items:center;gap:5px}
+.bp{background:var(--gold);color:var(--ink)}.bp:hover{background:var(--gl)}
+.bo{background:transparent;border:1px solid var(--bdr);color:var(--ink)}.bo:hover{border-color:var(--gold);color:var(--gold)}
+.bd{background:var(--red);color:#fff}.bd:hover{background:var(--rl)}
+.bt{background:var(--teal);color:#fff}.bt:hover{background:var(--tl)}
+.bg{background:var(--grn);color:#fff}.bg:hover{background:var(--grl)}
+.bpu{background:var(--pur);color:#fff}.bpu:hover{background:#7d5ea8}
+.sm{padding:4px 8px;font-size:11px}
+.tw{background:var(--pc);border:1px solid var(--bdr);border-radius:6px;overflow:hidden}
+.ttr{padding:11px 13px;border-bottom:1px solid var(--bdr);display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.sb0{padding:6px 10px;border:1px solid var(--bdr);border-radius:4px;background:var(--paper);font-family:var(--fn);font-size:13px;color:var(--ink);min-width:180px}
+.sb0:focus{outline:none;border-color:var(--gold)}
+.di{padding:6px 9px;border:1px solid var(--bdr);border-radius:4px;background:var(--paper);font-family:var(--fn);font-size:12px;color:var(--ink)}
+.di:focus{outline:none;border-color:var(--gold)}
+.fs0{padding:6px 8px;border:1px solid var(--bdr);border-radius:4px;background:var(--paper);font-family:var(--fn);font-size:13px;color:var(--ink);cursor:pointer}
+.fs0:focus{outline:none;border-color:var(--gold)}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--pw)}
+th{padding:9px 12px;text-align:left;font-size:11px;font-family:var(--fm);letter-spacing:.7px;color:#666;font-weight:500;border-bottom:1px solid var(--bdr);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid rgba(212,201,176,.45);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(201,168,76,.04)}
+.bx{display:inline-block;padding:2px 6px;border-radius:3px;font-size:10px;font-family:var(--fm);font-weight:500}
+.bx-paid{background:rgba(58,122,90,.15);color:var(--grn)}
+.bx-partial{background:rgba(42,107,124,.15);color:var(--teal)}
+.bx-unpaid{background:rgba(184,64,64,.12);color:var(--red)}
+.bx-settled{background:rgba(58,122,90,.15);color:var(--grn)}
+.bx-pending{background:rgba(201,168,76,.18);color:var(--gd)}
+.bx-approved{background:rgba(58,122,90,.15);color:var(--grn)}
+.bx-rejected{background:rgba(184,64,64,.12);color:var(--red)}
+.bx-processing{background:rgba(106,76,147,.15);color:var(--pur)}
+.bx-confirmed{background:rgba(58,122,90,.15);color:var(--grn)}
+.bx-cancelled{background:rgba(184,64,64,.12);color:var(--red)}
+.mo{position:fixed;inset:0;background:rgba(26,26,46,.55);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto}
+.mo.open{display:flex}
+.md{background:var(--pc);border-radius:8px;border:1px solid var(--bdr);width:100%;max-width:780px;box-shadow:0 18px 55px var(--shd);flex-shrink:0}
+.md-hd{padding:15px 19px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.md-hd h3{font-family:var(--fs);font-size:15px;font-weight:600}
+.md-cl{background:none;border:none;font-size:20px;cursor:pointer;color:#999;line-height:1;padding:2px 5px}
+.md-cl:hover{color:var(--ink)}
+.md-bd{padding:19px}
+.md-ft{padding:13px 19px;border-top:1px solid var(--bdr);display:flex;justify-content:flex-end;gap:8px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.ff{grid-column:1/-1}
+.fld{display:flex;flex-direction:column;gap:4px}
+.fld label{font-size:11px;color:#777;font-weight:500;text-transform:uppercase;letter-spacing:.3px}
+.fld input,.fld select,.fld textarea{padding:7px 9px;border:1px solid var(--bdr);border-radius:4px;background:var(--paper);font-family:var(--fn);font-size:13px;color:var(--ink);transition:border-color .13s}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--gold)}
+.fld textarea{resize:vertical;min-height:58px}
+.stl{font-family:var(--fs);font-size:12px;color:var(--gd);margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid rgba(201,168,76,.25);font-weight:600}
+.li-hd{display:grid;grid-template-columns:2.5fr 1fr .9fr 1.1fr 28px;gap:6px;font-size:10px;color:#888;font-family:var(--fm);padding:0 0 5px;border-bottom:1px solid var(--bdr);margin-bottom:6px}
+.li-row{display:grid;grid-template-columns:2.5fr 1fr .9fr 1.1fr 28px;gap:6px;margin-bottom:6px;align-items:center}
+.li-row input,.li-row select{padding:5px 6px;border:1px solid var(--bdr);border-radius:3px;background:var(--paper);font-size:12px;font-family:var(--fn);color:var(--ink);width:100%}
+.li-row input:focus,.li-row select:focus{outline:none;border-color:var(--gold)}
+.rl{background:none;border:1px solid var(--bdr);border-radius:3px;cursor:pointer;color:#aaa;font-size:12px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;transition:all .13s}
+.rl:hover{border-color:var(--red);color:var(--red)}
+.dt{display:flex;justify-content:flex-end;margin-top:9px;padding-top:9px;border-top:1px solid var(--bdr)}
+.dtb{background:var(--pw);border:1px solid var(--bdr);border-radius:4px;padding:8px 13px;min-width:180px}
+.dtb .rw{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;gap:20px}
+.dtb .rw.tot{font-weight:600;font-family:var(--fm);font-size:14px;color:var(--gd);border-top:1px solid var(--bdr);padding-top:5px;margin-top:3px}
+.pax-hd{display:grid;grid-template-columns:2fr 1fr 1.5fr 1fr 28px;gap:6px;font-size:10px;color:#888;font-family:var(--fm);padding:0 0 5px;border-bottom:1px solid var(--bdr);margin-bottom:6px}
+.pax-row{display:grid;grid-template-columns:2fr 1fr 1.5fr 1fr 28px;gap:6px;margin-bottom:6px;align-items:center}
+.pax-row input,.pax-row select{padding:5px 6px;border:1px solid var(--bdr);border-radius:3px;background:var(--paper);font-size:12px;font-family:var(--fn);color:var(--ink);width:100%}
+.pax-row input:focus,.pax-row select:focus{outline:none;border-color:var(--gold)}
+.seg-card{background:var(--paper);border:1px solid var(--bdr);border-radius:5px;padding:12px;margin-bottom:10px}
+.seg-title{font-size:12px;font-family:var(--fm);color:var(--gd);font-weight:500;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.seg-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.seg-field{display:flex;flex-direction:column;gap:3px}
+.seg-field label{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:.3px}
+.seg-field input,.seg-field select{padding:5px 7px;border:1px solid var(--bdr);border-radius:3px;background:var(--pc);font-size:12px;font-family:var(--fn);color:var(--ink);width:100%}
+.seg-field input:focus,.seg-field select:focus{outline:none;border-color:var(--gold)}
+.pd{background:#fff;border:1px solid #ddd;border-radius:4px;padding:30px 36px;font-family:var(--fs);color:#111}
+.pd-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;padding-bottom:14px;border-bottom:2px solid #1a1a2e}
+.pd-co h2{font-size:18px;font-weight:700;color:#1a1a2e}
+.pd-co p{font-size:11px;color:#666;margin-top:2px;line-height:1.5;font-family:var(--fn)}
+.pd-tp{text-align:right}
+.pd-tp .tl{font-size:22px;font-weight:700;color:var(--gd);letter-spacing:1px;display:block}
+.pd-tp .no{font-family:var(--fm);font-size:11px;color:#666;margin-top:2px}
+.pm{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.pm .lb{font-size:10px;letter-spacing:1px;color:#999;text-transform:uppercase;margin-bottom:2px;font-family:var(--fm)}
+.pm .vl{font-size:12px;color:#222;line-height:1.6}
+.ptb{width:100%;border-collapse:collapse;margin-bottom:14px}
+.ptb th{background:#1a1a2e;color:#e8c97a;padding:7px 10px;font-size:10px;font-family:var(--fm);font-weight:500;letter-spacing:.5px;text-align:left}
+.ptb td{padding:7px 10px;border-bottom:1px solid #eee;font-size:12px}
+.ptb tr:last-child td{border-bottom:none}
+.ptot{display:flex;justify-content:flex-end}
+.ptot-b{width:220px}
+.ptot-r{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid #eee}
+.ptot-r.gd{font-weight:700;font-size:14px;color:var(--gd);border-bottom:2px solid #1a1a2e;padding-bottom:6px}
+.pft{margin-top:22px;padding-top:11px;border-top:1px solid #eee;font-size:10px;color:#aaa;text-align:center;font-family:var(--fn)}
+.pst{display:inline-block;border:2px solid var(--grn);color:var(--grn);padding:3px 11px;border-radius:3px;font-size:11px;font-family:var(--fm);font-weight:600;letter-spacing:2px;transform:rotate(-8deg);margin-top:8px}
+.pst.r{border-color:var(--red);color:var(--red)}.pst.p{border-color:var(--pur);color:var(--pur)}
+.rpt-bar{background:var(--pc);border:1px solid var(--bdr);border-radius:6px;padding:13px 15px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.rpt-bar .rf{display:flex;flex-direction:column;gap:3px}
+.rpt-bar .rf label{font-size:11px;color:#888;font-family:var(--fm);text-transform:uppercase;letter-spacing:.3px}
+.rpt-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:14px}
+.rsc{background:var(--pc);border:1px solid var(--bdr);border-radius:5px;padding:11px 13px}
+.rsc .lb{font-size:10px;color:#888;font-family:var(--fm);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px}
+.rsc .vl{font-family:var(--fm);font-size:17px;font-weight:500}
+.ht{padding:6px 0}
+.hi{display:flex;gap:11px;padding:8px 0;border-bottom:1px solid var(--bdr)}
+.hi:last-child{border-bottom:none}
+.hd2{width:8px;height:8px;border-radius:50%;background:var(--gold);margin-top:4px;flex-shrink:0}
+.hc .dr{font-family:var(--fm);font-size:11px;color:var(--teal);font-weight:500}
+.hc .dd{font-size:12px;margin:2px 0}
+.hc .dm{font-size:11px;color:#999}
+.es{text-align:center;padding:36px 16px;color:#aaa}
+.tg{display:inline-block;background:rgba(42,107,124,.12);color:var(--teal);font-size:10px;padding:2px 5px;border-radius:3px;font-family:var(--fm)}
+.tg.p{background:rgba(106,76,147,.12);color:var(--pur)}
+.al{padding:8px 12px;border-radius:4px;font-size:12px;margin-bottom:12px}
+.al-i{background:rgba(42,107,124,.1);border:1px solid rgba(42,107,124,.3);color:var(--teal)}
+.am{font-family:var(--fm)}.pos{color:var(--grn)}.neg{color:var(--red)}.neu{color:var(--gd)}
+@media print{
+  .sb,.tb,.md-hd,.md-ft,.no-print{display:none!important}
+  .mo{position:static;background:none;padding:0}
+  .md{box-shadow:none;border:none;max-width:100%}
+  .pd{border:none;padding:0}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="sb-logo">
+    <h1>Travel Agency<br>Accounting</h1>
+    <p>System v2.0</p>
+  </div>
+  <nav>
+    <div class="ns"><div class="nl">Overview</div>
+      <div class="ni active" data-v="dashboard">&#128202; Dashboard</div>
+    </div>
+    <div class="ns"><div class="nl">Clients &amp; Bookings</div>
+      <div class="ni" data-v="customers">&#128100; Clients</div>
+      <div class="ni" data-v="orders">&#9992; Bookings</div>
+    </div>
+    <div class="ns"><div class="nl">Documents</div>
+      <div class="ni" data-v="invoices">&#128196; Invoice</div>
+      <div class="ni" data-v="receipts">&#129534; Receipt</div>
+      <div class="ni" data-v="creditnotes">&#128203; Credit Note</div>
+      <div class="ni" data-v="debitnotes">&#128209; Debit Note</div>
+      <div class="ni" data-v="eo">&#128178; Exchange Order</div>
+      <div class="ni" data-v="refunds">&#8617; Refund Application</div>
+    </div>
+    <div class="ns"><div class="nl">Reports</div>
+      <div class="ni" data-v="rpt-os">&#128308; Outstanding</div>
+      <div class="ni" data-v="rpt-inv">&#128196; Invoice Report</div>
+      <div class="ni" data-v="rpt-rec">&#129534; Receipt Report</div>
+      <div class="ni" data-v="rpt-cn">&#128203; Credit Note Rpt</div>
+      <div class="ni" data-v="rpt-dn">&#128209; Debit Note Rpt</div>
+      <div class="ni" data-v="rpt-eo">&#128178; Exch Order Rpt</div>
+      <div class="ni" data-v="rpt-rf">&#8617; Refund Report</div>
+    </div>
+  </nav>
+</aside>
+
+<div class="mn">
+<div class="tb">
+  <h2 id="vtitle">Dashboard</h2>
+  <div class="tba" id="tba"></div>
+</div>
+<div class="ct">
+
+<!-- DASHBOARD -->
+<div id="view-dashboard" class="view active">
+  <div class="sg" id="dash-sg"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div class="tw">
+      <div class="ttr" style="padding:10px 13px"><span style="font-family:var(--fs);font-weight:600;font-size:13px">Recent Bookings</span></div>
+      <table><thead><tr><th>Booking#</th><th>Client</th><th>Itinerary</th><th>Departure</th><th>Status</th></tr></thead>
+      <tbody id="dash-ord"></tbody></table>
+    </div>
+    <div class="tw">
+      <div class="ttr" style="padding:10px 13px"><span style="font-family:var(--fs);font-weight:600;font-size:13px">Top 5 Outstanding</span></div>
+      <table><thead><tr><th>Invoice#</th><th>Client</th><th>Amount</th><th>Balance</th></tr></thead>
+      <tbody id="dash-un"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENTS -->
+<div id="view-customers" class="view">
+  <div class="tw">
+    <div class="ttr">
+      <input class="sb0" placeholder="Search name / phone / email..." oninput="ftbl('ctb',this.value,[0,1,2])">
+      <button class="btn bp" onclick="openCustM()">+ New Client</button>
+    </div>
+    <table><thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Passport</th><th>Notes</th><th>Bookings</th><th>Actions</th></tr></thead>
+    <tbody id="ctb"></tbody></table>
+  </div>
+</div>
+
+<!-- BOOKINGS -->
+<div id="view-orders" class="view">
+  <div class="tw">
+    <div class="ttr">
+      <input class="sb0" placeholder="Search client / itinerary / booking#..." oninput="ftbl('otb',this.value,[0,1,2])">
+      <select class="fs0" onchange="fbst('otb',this.value,5)">
+        <option value="">All Status</option>
+        <option value="confirmed">Confirmed</option><option value="pending">Pending</option><option value="cancelled">Cancelled</option>
+      </select>
+      <button class="btn bp" onclick="openOrderM()">+ New Booking</button>
+    </div>
+    <table><thead><tr><th>Booking#</th><th>Client</th><th>Itinerary</th><th>Pax</th><th>Services</th><th>Status</th><th>Departure</th><th>Actions</th></tr></thead>
+    <tbody id="otb"></tbody></table>
+  </div>
+</div>
+
+<!-- INVOICES -->
+<div id="view-invoices" class="view">
+  <div class="tw">
+    <div class="ttr">
+      <input class="sb0" placeholder="Search invoice# / client..." oninput="ftbl('itb',this.value,[0,1])">
+      <select class="fs0" onchange="fbst('itb',this.value,3)">
+        <option value="">All</option><option value="unpaid">Unpaid</option><option value="partial">Partial</option><option value="paid">Paid</option>
+      </select>
+      <button class="btn bp" onclick="openDocM('INV')">+ New Invoice</button>
+    </div>
+    <table><thead><tr><th>Invoice#</th><th>Client</th><th>Booking</th><th>Status</th><th>Amount</th><th>Received</th><th>Balance</th><th>Date</th><th>Actions</th></tr></thead>
+    <tbody id="itb"></tbody></table>
+  </div>
+</div>
+
+<!-- RECEIPTS -->
+<div id="view-receipts" class="view">
+  <div class="tw">
+    <div class="ttr">
+      <input class="sb0" placeholder="Search receipt# / client..." oninput="ftbl('rtb',this.value,[0,1])">
+      <button class="btn bp" onclick="openDocM('REC')">+ New Receipt</button>
+    </div>
+    <table><thead><tr><th>Receipt#</th><th>Client</th><th>Ref Invoice</th><th>Amount</th><th>Payment Method</th><th>Date</th><th>Actions</th></tr></thead>
+    <tbody id="rtb"></tbody></table>
+  </div>
+</div>
+
+<!-- CREDIT NOTES -->
+<div id="view-creditnotes" class="view">
+  <div class="tw">
+    <div class="ttr">
+      <input class="sb0" placeholder="Search CN# / client..." oninput="ftbl('cntb',this.value,[0,1])">
+      <button class="btn bp" onclick="openDocM('CN')">+ New Credit Note</button>
+    </div>
+    <table><thead><tr><th>CN#</th><th>Client</th><th>Ref Invoice</th><th>Reason</th><th>Amount</th><th>Date</th><th>Actions</th></tr></thead>
+    <tbody id="cntb"></tbody></table>
+  </div>
+</div>
+
+<!-- DEBIT NOTES -->
+<div id="view-debitnotes" class="view">
+  <div class="tw">
+    <div class="ttr">
+      <input class="sb0" placeholder="Search DN# / client..." oninput="ftbl('dntb',this.value,[0,1])">
+      <button class="btn bp" onclick="openDocM('DN')">+ New Debit Note</button>
+    </div>
+    <table><thead><tr><th>DN#</th><th>Client</th><th>Ref Invoice</th><th>Reason</th><th>Amount</th><th>Date</th><th>Actions</th></tr></thead>
+    <tbody id="dntb"></tbody></table>
+  </div>
+</div>
+
+<!-- EXCHANGE ORDERS -->
+<div id="view-eo" class="view">
+  <div class="tw">
+    <div class="ttr">
+      <input class="sb0" placeholder="Search EO# / supplier..." oninput="ftbl('eotb',this.value,[0,1])">
+      <select class="fs0" onchange="fbst('eotb',this.value,3)">
+        <option value="">All</option><option value="pending">Pending</option><option value="settled">Settled</option>
+      </select>
+      <button class="btn bp" onclick="openDocM('EO')">+ New Exchange Order</button>
+    </div>
+    <table><thead><tr><th>EO#</th><th>Supplier</th><th>Service</th><th>Status</th><th>Amount</th><th>Booking Ref</th><th>Settled Date</th><th>Actions</th></tr></thead>
+    <tbody id="eotb"></tbody></table>
+  </div>
+</div>
+
+<!-- REFUND APPLICATIONS -->
+<div id="view-refunds" class="view">
+  <div class="tw">
+    <div class="ttr">
+      <input class="sb0" placeholder="Search RA# / client / booking..." oninput="ftbl('rftb',this.value,[0,1,2])">
+      <select class="fs0" onchange="fbst('rftb',this.value,3)">
+        <option value="">All Status</option>
+        <option value="processing">Processing</option><option value="approved">Approved</option><option value="rejected">Rejected</option>
+      </select>
+      <button class="btn bp" onclick="openRefundM()">+ New Refund Application</button>
+    </div>
+    <table><thead><tr><th>RA#</th><th>Client</th><th>Booking</th><th>Status</th><th>Refund Amount</th><th>Reason</th><th>Date</th><th>Actions</th></tr></thead>
+    <tbody id="rftb"></tbody></table>
+  </div>
+</div>
+
+<!-- REPORT: OUTSTANDING -->
+<div id="view-rpt-os" class="view">
+  <div class="al al-i">&#128204; Showing all invoices not fully paid (Unpaid + Partial)</div>
+  <div class="rpt-bar">
+    <div class="rf"><label>Search Client</label><input class="sb0" style="min-width:160px" placeholder="Client name..." oninput="ftbl('ostb',this.value,[1])"></div>
+    <button class="btn bo no-print" onclick="window.print()">&#128424; Print Report</button>
+  </div>
+  <div class="rpt-sum" id="os-sum"></div>
+  <div class="tw"><table><thead><tr><th>Invoice#</th><th>Client</th><th>Booking Ref</th><th>Invoice Date</th><th>Amount</th><th>Received</th><th>Balance Due</th><th>Days Outstanding</th></tr></thead>
+  <tbody id="ostb"></tbody></table>
+  <div id="os-tot" style="padding:12px 14px;border-top:1px solid var(--bdr);text-align:right;font-family:var(--fm);font-weight:600;color:var(--red);font-size:14px"></div>
+  </div>
+</div>
+
+<!-- GENERIC REPORT VIEWS -->
+<div id="view-rpt-inv" class="view"><div id="rpt-inv-ct"></div></div>
+<div id="view-rpt-rec" class="view"><div id="rpt-rec-ct"></div></div>
+<div id="view-rpt-cn" class="view"><div id="rpt-cn-ct"></div></div>
+<div id="view-rpt-dn" class="view"><div id="rpt-dn-ct"></div></div>
+<div id="view-rpt-eo" class="view"><div id="rpt-eo-ct"></div></div>
+<div id="view-rpt-rf" class="view"><div id="rpt-rf-ct"></div></div>
+
+</div></div></div>
+
+<!-- ═══════ MODALS ═══════ -->
+
+<!-- CLIENT MODAL -->
+<div class="mo" id="mo-cust">
+  <div class="md">
+    <div class="md-hd"><h3 id="cust-mt">New Client</h3><button class="md-cl" onclick="closeM('mo-cust')">&#215;</button></div>
+    <div class="md-bd">
+      <div class="fg">
+        <div class="fld"><label>Full Name *</label><input id="cn" placeholder="Chan Tai Man"></div>
+        <div class="fld"><label>Phone</label><input id="cp" placeholder="9XXX XXXX"></div>
+        <div class="fld"><label>Email</label><input id="ce" type="email" placeholder="xxx@email.com"></div>
+        <div class="fld"><label>Passport No.</label><input id="cpa" placeholder="HK..."></div>
+        <div class="fld ff"><label>Notes</label><textarea id="cno" placeholder="Dietary requirements, special requests..."></textarea></div>
+      </div>
+    </div>
+    <div class="md-ft"><button class="btn bo" onclick="closeM('mo-cust')">Cancel</button><button class="btn bp" onclick="saveCust()">Save Client</button></div>
+  </div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="mo" id="mo-order">
+  <div class="md" style="max-width:900px">
+    <div class="md-hd"><h3 id="order-mt">New Booking</h3><button class="md-cl" onclick="closeM('mo-order')">&#215;</button></div>
+    <div class="md-bd">
+      <div class="fg">
+        <div class="fld"><label>Client *</label><select id="oc"></select></div>
+        <div class="fld"><label>Status</label>
+          <select id="os"><option value="confirmed">Confirmed</option><option value="pending">Pending</option><option value="cancelled">Cancelled</option></select>
+        </div>
+        <div class="fld ff"><label>Itinerary Description</label><input id="od" placeholder="e.g. Japan Tokyo 5D4N Free & Easy"></div>
+        <div class="fld"><label>Notes</label><textarea id="on" placeholder="Visa requirements, special requests..."></textarea></div>
+        <div class="fld"><label>Booking Date</label><input id="odt" type="date"></div>
+      </div>
+
+      <div class="stl">&#128100; Passenger List (add multiple passengers)</div>
+      <div class="pax-hd"><div>Passenger Name (as in passport)</div><div>Type</div><div>Passport No.</div><div>Notes</div><div></div></div>
+      <div id="pax-body"></div>
+      <button class="btn bo sm" onclick="addPax()" style="margin-bottom:8px">+ Add Passenger</button>
+
+      <div class="stl">&#128196; Travel Services (add multiple service categories, each with multiple segments)</div>
+      <div id="seg-body"></div>
+      <button class="btn bo sm" onclick="addSegGroup()">+ Add Service Category</button>
+    </div>
+    <div class="md-ft"><button class="btn bo" onclick="closeM('mo-order')">Cancel</button><button class="btn bp" onclick="saveOrder()">Save Booking</button></div>
+  </div>
+</div>
+
+<!-- DOCUMENT MODAL -->
+<div class="mo" id="mo-doc">
+  <div class="md" style="max-width:840px">
+    <div class="md-hd"><h3 id="doc-mt">New Document</h3><button class="md-cl" onclick="closeM('mo-doc')">&#215;</button></div>
+    <div class="md-bd"><div id="doc-fc"></div></div>
+    <div class="md-ft"><button class="btn bo" onclick="closeM('mo-doc')">Cancel</button><button class="btn bp" onclick="saveDoc()">Save Document</button></div>
+  </div>
+</div>
+
+<!-- REFUND MODAL -->
+<div class="mo" id="mo-refund">
+  <div class="md" style="max-width:820px">
+    <div class="md-hd"><h3 id="rf-mt">Refund Application</h3><button class="md-cl" onclick="closeM('mo-refund')">&#215;</button></div>
+    <div class="md-bd">
+      <div class="fg">
+        <div class="fld"><label>Client *</label><select id="rfc" onchange="loadRefundInv()"></select></div>
+        <div class="fld"><label>Ref. Booking</label><select id="rfo"></select></div>
+        <div class="fld"><label>Ref. Invoice</label><select id="rfi"></select></div>
+        <div class="fld"><label>Application Date</label><input id="rfd" type="date"></div>
+        <div class="fld"><label>Status</label>
+          <select id="rfs"><option value="processing">Processing</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select>
+        </div>
+        <div class="fld"><label>Process Date</label><input id="rfpd" type="date"></div>
+        <div class="fld ff"><label>Reason for Refund *</label><input id="rfr" placeholder="Flight cancellation, itinerary change..."></div>
+      </div>
+      <div class="stl">&#9993; Refund Items</div>
+      <div class="li-hd"><div>Description</div><div>Qty</div><div>Unit</div><div>Refund Amount (HK$)</div><div></div></div>
+      <div id="rf-li-body"></div>
+      <button class="btn bo sm" onclick="addRfLi()" style="margin-top:5px">+ Add Item</button>
+      <div class="dt"><div class="dtb"><div class="rw"><span>Total Refund</span><span id="rf-tot">HK$0.00</span></div></div></div>
+      <div class="stl">&#128247; Additional Notes</div>
+      <div class="fld"><label>Notes</label><textarea id="rfn" placeholder="Airline refund policy ref, supplier confirmation no..."></textarea></div>
+    </div>
+    <div class="md-ft"><button class="btn bo" onclick="closeM('mo-refund')">Cancel</button><button class="btn bp" onclick="saveRefund()">Save Application</button></div>
+  </div>
+</div>
+
+<!-- PRINT MODAL -->
+<div class="mo" id="mo-print">
+  <div class="md" style="max-width:840px">
+    <div class="md-hd no-print"><h3>Document Preview</h3><button class="md-cl" onclick="closeM('mo-print')">&#215;</button></div>
+    <div class="md-bd" id="print-ct"></div>
+    <div class="md-ft no-print">
+      <button class="btn bo" onclick="closeM('mo-print')">Close</button>
+      <button class="btn bp" onclick="window.print()">&#128424; Print / Save PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY MODAL -->
+<div class="mo" id="mo-hist">
+  <div class="md">
+    <div class="md-hd"><h3 id="hist-t">Client History</h3><button class="md-cl" onclick="closeM('mo-hist')">&#215;</button></div>
+    <div class="md-bd"><div id="hist-ct"></div></div>
+    <div class="md-ft"><button class="btn bo" onclick="closeM('mo-hist')">Close</button></div>
+  </div>
+</div>
+
+<!-- PAY MODAL -->
+<div class="mo" id="mo-pay">
+  <div class="md" style="max-width:480px">
+    <div class="md-hd"><h3 id="pay-t">Record Payment</h3><button class="md-cl" onclick="closeM('mo-pay')">&#215;</button></div>
+    <div class="md-bd"><div id="pay-ct"></div></div>
+    <div class="md-ft"><button class="btn bo" onclick="closeM('mo-pay')">Cancel</button><button class="btn bg" onclick="confirmPay()">Confirm</button></div>
+  </div>
+</div>
+
+<script>
+// ══════════════ DATA ══════════════
+const CO={name:'Travel Co. Limited',addr:'123 Hennessy Road, Wan Chai, Hong Kong',tel:'2XXX XXXX',email:'info@travelco.hk'};
+
+let db=loadDB();
+function loadDB(){
+  const s=localStorage.getItem('trav_v2_en');
+  if(s) return JSON.parse(s);
+  return {customers:[],orders:[],invoices:[],receipts:[],creditnotes:[],debitnotes:[],eos:[],refunds:[],
+    ctr:{INV:0,REC:0,CN:0,DN:0,EO:0,ORD:0,RA:0}};
+}
+function sDB(){ localStorage.setItem('trav_v2_en',JSON.stringify(db)); }
+function nxt(t){
+  db.ctr[t]++;sDB();
+  return `${t}${new Date().getFullYear()}-${String(db.ctr[t]).padStart(4,'0')}`;
+}
+function td(){ return new Date().toISOString().slice(0,10); }
+function fmt(n){ return 'HK$'+Number(n||0).toLocaleString('en-HK',{minimumFractionDigits:2}); }
+function eid(x){ return document.getElementById(x); }
+function openM(id){ eid(id).classList.add('open'); }
+function closeM(id){ eid(id).classList.remove('open'); }
+document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+// ══════════════ NAV ══════════════
+const VT={dashboard:'Dashboard',customers:'Clients',orders:'Bookings',
+  invoices:'Invoice',receipts:'Receipt',creditnotes:'Credit Note',debitnotes:'Debit Note',
+  eo:'Exchange Order',refunds:'Refund Application',
+  'rpt-os':'Outstanding Report','rpt-inv':'Invoice Report','rpt-rec':'Receipt Report',
+  'rpt-cn':'Credit Note Report','rpt-dn':'Debit Note Report','rpt-eo':'Exchange Order Report','rpt-rf':'Refund Report'};
+
+document.querySelectorAll('.ni').forEach(el=>{
+  el.addEventListener('click',function(){
+    const v=this.dataset.v;
+    document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+    this.classList.add('active');
+    document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+    eid('view-'+v).classList.add('active');
+    eid('vtitle').textContent=VT[v]||v;
+    eid('tba').innerHTML='';
+    const fn={dashboard:rDash,customers:rCust,orders:rOrders,invoices:rInv,receipts:rRec,
+      creditnotes:rCN,debitnotes:rDN,eo:rEO,refunds:rRefunds,
+      'rpt-os':rptOS,'rpt-inv':()=>rptDoc('inv'),'rpt-rec':()=>rptDoc('rec'),
+      'rpt-cn':()=>rptDoc('cn'),'rpt-dn':()=>rptDoc('dn'),'rpt-eo':()=>rptDoc('eo'),'rpt-rf':()=>rptDoc('rf')};
+    if(fn[v]) fn[v]();
+  });
+});
+
+function ftbl(id,q,cols){
+  q=q.toLowerCase();
+  eid(id).querySelectorAll('tr').forEach(r=>{
+    const tds=r.querySelectorAll('td');
+    r.style.display=cols.some(c=>tds[c]&&tds[c].textContent.toLowerCase().includes(q))?'':'none';
+  });
+}
+function fbst(id,val,col){
+  eid(id).querySelectorAll('tr').forEach(r=>{
+    const td=r.querySelectorAll('td')[col];
+    r.style.display=(!val||(td&&td.textContent.toLowerCase().includes(val.toLowerCase())))?'':'none';
+  });
+}
+function eRow(cols,msg){return `<tr><td colspan="${cols}"><div class="es"><p>${msg}</p></div></td></tr>`;}
+
+// ══════════════ DASHBOARD ══════════════
+function rDash(){
+  const ti=db.invoices.reduce((s,i)=>s+i.amount,0);
+  const tp=db.invoices.reduce((s,i)=>s+i.paid,0);
+  const os=ti-tp;
+  const eoUp=db.eos.filter(e=>e.status==='pending').reduce((s,e)=>s+e.amount,0);
+  const rfPend=db.refunds.filter(r=>r.status==='processing').length;
+  eid('dash-sg').innerHTML=`
+    <div class="sc gold"><div class="lb">Clients / Bookings</div><div class="vl">${db.customers.length}</div><div class="sb2">${db.orders.length} bookings</div></div>
+    <div class="sc teal"><div class="lb">Invoice Total</div><div class="vl" style="font-size:15px">${fmt(ti)}</div><div class="sb2">Received: ${fmt(tp)}</div></div>
+    <div class="sc red"><div class="lb">Outstanding</div><div class="vl" style="font-size:15px;color:var(--red)">${fmt(os)}</div><div class="sb2">${db.invoices.filter(i=>i.status!=='paid').length} unpaid invoices</div></div>
+    <div class="sc grn"><div class="lb">Supplier Payable</div><div class="vl" style="font-size:15px;color:var(--red)">${fmt(eoUp)}</div><div class="sb2">${db.eos.filter(e=>e.status==='pending').length} pending EO</div></div>
+    <div class="sc pur"><div class="lb">Refund Applications</div><div class="vl" style="color:var(--pur)">${rfPend}</div><div class="sb2">Processing</div></div>`;
+  const ro=[...db.orders].reverse().slice(0,5);
+  eid('dash-ord').innerHTML=ro.map(o=>{
+    const c=db.customers.find(x=>x.id===o.cid);
+    const dep=o.segs&&o.segs.length&&o.segs[0].segments&&o.segs[0].segments.length?o.segs[0].segments[0].depDate||'—':'—';
+    return `<tr><td class="am" style="color:var(--teal);font-size:11px">${o.no}</td><td>${c?c.name:'—'}</td><td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.desc||'—'}</td><td style="font-size:11px">${dep}</td><td><span class="bx bx-${o.status}">${o.status}</span></td></tr>`;
+  }).join('')||eRow(5,'No bookings yet');
+  const up=db.invoices.filter(i=>i.status!=='paid').sort((a,b)=>(b.amount-b.paid)-(a.amount-a.paid)).slice(0,5);
+  eid('dash-un').innerHTML=up.map(i=>{
+    const c=db.customers.find(x=>x.id===i.cid);
+    return `<tr><td class="am" style="color:var(--teal);font-size:11px">${i.no}</td><td>${c?c.name:'—'}</td><td class="am">${fmt(i.amount)}</td><td class="am neg">${fmt(i.amount-i.paid)}</td></tr>`;
+  }).join('')||eRow(4,'All invoices settled ✓');
+}
+
+// ══════════════ CLIENTS ══════════════
+let eCid=null;
+function openCustM(){ eCid=null; eid('cust-mt').textContent='New Client'; ['cn','cp','ce','cpa','cno'].forEach(x=>eid(x).value=''); openM('mo-cust'); }
+function rCust(){
+  eid('ctb').innerHTML=db.customers.map(c=>{
+    const oc=db.orders.filter(o=>o.cid===c.id).length;
+    return `<tr><td><strong>${c.name}</strong></td><td>${c.phone||'—'}</td><td>${c.email||'—'}</td><td style="font-size:11px">${c.passport||'—'}</td><td style="max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.notes||'—'}</td><td><span class="tg">${oc}</span></td>
+    <td><button class="btn bo sm" onclick="vHist('${c.id}')">History</button> <button class="btn bt sm" onclick="eCust('${c.id}')">Edit</button> <button class="btn bd sm" onclick="dCust('${c.id}')">Del</button></td></tr>`;
+  }).join('')||eRow(7,'No clients yet. Click "+ New Client" to get started.');
+}
+function eCust(id){
+  const c=db.customers.find(x=>x.id===id); eCid=id;
+  eid('cust-mt').textContent='Edit Client';
+  eid('cn').value=c.name||''; eid('cp').value=c.phone||''; eid('ce').value=c.email||'';
+  eid('cpa').value=c.passport||''; eid('cno').value=c.notes||'';
+  openM('mo-cust');
+}
+function saveCust(){
+  const nm=eid('cn').value.trim(); if(!nm){alert('Please enter client name');return;}
+  const d={name:nm,phone:eid('cp').value,email:eid('ce').value,passport:eid('cpa').value,notes:eid('cno').value};
+  if(eCid){ Object.assign(db.customers.find(x=>x.id===eCid),d); }
+  else{ db.customers.push({id:'C'+Date.now(),...d,createdAt:td()}); }
+  sDB(); closeM('mo-cust'); rCust();
+}
+function dCust(id){ if(!confirm('Delete this client?'))return; db.customers=db.customers.filter(c=>c.id!==id); sDB(); rCust(); }
+
+// ══════════════ BOOKINGS ══════════════
+let eOid=null; let oPax=[]; let oSegs=[];
+function fillCustSel(selId,val=''){
+  eid(selId).innerHTML='<option value="">-- Select Client --</option>'+db.customers.map(c=>`<option value="${c.id}"${c.id===val?' selected':''}>${c.name}</option>`).join('');
+}
+function fillOrdSel(selId,val=''){
+  eid(selId).innerHTML='<option value="">-- None --</option>'+db.orders.map(o=>`<option value="${o.no}"${o.no===val?' selected':''}>${o.no}${o.desc?' — '+o.desc.slice(0,20):''}</option>`).join('');
+}
+function fillInvSel(selId,val='',custId=''){
+  const invs=custId?db.invoices.filter(i=>i.cid===custId):db.invoices;
+  eid(selId).innerHTML='<option value="">-- None --</option>'+invs.map(i=>`<option value="${i.no}"${i.no===val?' selected':''}>${i.no}</option>`).join('');
+}
+function openOrderM(){
+  eOid=null; oPax=[{name:'',type:'ADT',passport:'',notes:''}];
+  oSegs=[{type:'Flight',segments:[{dep:'',dest:'',depDate:'',retDate:'',flight:'',ref:'',notes:''}]}];
+  fillCustSel('oc'); eid('os').value='confirmed'; eid('od').value=''; eid('on').value=''; eid('odt').value=td();
+  eid('order-mt').textContent='New Booking';
+  renderPax(); renderSegs(); openM('mo-order');
+}
+function renderPax(){
+  eid('pax-body').innerHTML=oPax.map((p,i)=>`
+    <div class="pax-row">
+      <input value="${p.name}" oninput="oPax[${i}].name=this.value" placeholder="CHAN TAI MAN">
+      <select onchange="oPax[${i}].type=this.value"><option value="ADT"${p.type==='ADT'?' selected':''}>Adult</option><option value="CHD"${p.type==='CHD'?' selected':''}>Child</option><option value="INF"${p.type==='INF'?' selected':''}>Infant</option></select>
+      <input value="${p.passport}" oninput="oPax[${i}].passport=this.value" placeholder="HK...">
+      <input value="${p.notes}" oninput="oPax[${i}].notes=this.value" placeholder="Notes">
+      <button class="rl" onclick="oPax.splice(${i},1);renderPax()">&#215;</button>
+    </div>`).join('');
+}
+function addPax(){ oPax.push({name:'',type:'ADT',passport:'',notes:''}); renderPax(); }
+function renderSegs(){
+  eid('seg-body').innerHTML=oSegs.map((g,gi)=>`
+    <div class="seg-card">
+      <div class="seg-title">
+        <div style="display:flex;gap:8px;align-items:center">
+          <select style="padding:4px 7px;border:1px solid var(--bdr);border-radius:3px;font-size:12px;font-family:var(--fn)" onchange="oSegs[${gi}].type=this.value">
+            <option value="Flight"${g.type==='Flight'?' selected':''}>&#9992; Flight</option>
+            <option value="Hotel"${g.type==='Hotel'?' selected':''}>&#127968; Hotel</option>
+            <option value="Coach"${g.type==='Coach'?' selected':''}>&#128652; Coach / Transfer</option>
+            <option value="Insurance"${g.type==='Insurance'?' selected':''}>&#128737; Travel Insurance</option>
+            <option value="Visa"${g.type==='Visa'?' selected':''}>&#128196; Visa</option>
+            <option value="Miscellaneous"${g.type==='Miscellaneous'?' selected':''}>&#128230; Miscellaneous</option>
+          </select>
+          <span style="font-size:11px;color:#999">${g.segments.length} segment(s)</span>
+        </div>
+        <button class="btn bd sm" onclick="oSegs.splice(${gi},1);renderSegs()">Remove Category</button>
+      </div>
+      ${g.segments.map((s,si)=>renderSegRow(gi,si,s,g.type)).join('')}
+      <button class="btn bo sm" onclick="oSegs[${gi}].segments.push({dep:'',dest:'',depDate:'',retDate:'',flight:'',ref:'',notes:''});renderSegs()">+ Add Segment</button>
+    </div>`).join('');
+}
+function renderSegRow(gi,si,s,type){
+  const isHotel=type==='Hotel';
+  return `<div style="background:var(--pw);border:1px solid var(--bdr);border-radius:4px;padding:10px;margin-bottom:8px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+      <span style="font-size:11px;font-family:var(--fm);color:var(--gd)">Segment ${si+1}</span>
+      ${si>0?`<button class="rl" onclick="oSegs[${gi}].segments.splice(${si},1);renderSegs()">&#215;</button>`:'<span></span>'}
+    </div>
+    <div class="seg-grid">
+      <div class="seg-field"><label>${isHotel?'City / Destination':'Origin'}</label><input value="${s.dep}" oninput="oSegs[${gi}].segments[${si}].dep=this.value" placeholder="${isHotel?'Tokyo':'HKG'}"></div>
+      <div class="seg-field"><label>${isHotel?'Hotel Name':'Destination'}</label><input value="${s.dest}" oninput="oSegs[${gi}].segments[${si}].dest=this.value" placeholder="${isHotel?'Shinjuku Grand Hotel':'TYO'}"></div>
+      <div class="seg-field"><label>${isHotel?'Confirmation No.':'Flight / Ref No.'}</label><input value="${s.flight||s.ref||''}" oninput="oSegs[${gi}].segments[${si}].flight=this.value;oSegs[${gi}].segments[${si}].ref=this.value" placeholder="${isHotel?'HTLBK001':'CX 543'}"></div>
+    </div>
+    <div class="seg-grid">
+      <div class="seg-field"><label>${isHotel?'Check-in Date':'Departure Date'}</label><input type="date" value="${s.depDate}" oninput="oSegs[${gi}].segments[${si}].depDate=this.value"></div>
+      <div class="seg-field"><label>${isHotel?'Check-out Date':'Return Date'}</label><input type="date" value="${s.retDate}" oninput="oSegs[${gi}].segments[${si}].retDate=this.value"></div>
+      <div class="seg-field"><label>Notes</label><input value="${s.notes||''}" oninput="oSegs[${gi}].segments[${si}].notes=this.value" placeholder="Remarks..."></div>
+    </div>
+  </div>`;
+}
+function addSegGroup(){ oSegs.push({type:'Flight',segments:[{dep:'',dest:'',depDate:'',retDate:'',flight:'',ref:'',notes:''}]}); renderSegs(); }
+function saveOrder(){
+  const cid=eid('oc').value; if(!cid){alert('Please select a client');return;}
+  const d={cid,desc:eid('od').value,status:eid('os').value,notes:eid('on').value,date:eid('odt').value||td(),
+    pax:JSON.parse(JSON.stringify(oPax)),segs:JSON.parse(JSON.stringify(oSegs))};
+  if(eOid){ Object.assign(db.orders.find(o=>o.id===eOid),d); }
+  else{ db.orders.push({id:'O'+Date.now(),no:nxt('ORD'),...d}); }
+  sDB(); closeM('mo-order'); rOrders();
+}
+function eOrder(id){
+  const o=db.orders.find(x=>x.id===id); eOid=id;
+  oPax=JSON.parse(JSON.stringify(o.pax||[{name:'',type:'ADT',passport:'',notes:''}]));
+  oSegs=JSON.parse(JSON.stringify(o.segs||[{type:'Flight',segments:[{dep:'',dest:'',depDate:'',retDate:'',flight:'',ref:'',notes:''}]}]));
+  fillCustSel('oc',o.cid); eid('os').value=o.status||'confirmed';
+  eid('od').value=o.desc||''; eid('on').value=o.notes||''; eid('odt').value=o.date||td();
+  eid('order-mt').textContent='Edit Booking';
+  renderPax(); renderSegs(); openM('mo-order');
+}
+function dOrder(id){ if(!confirm('Delete this booking?'))return; db.orders=db.orders.filter(o=>o.id!==id); sDB(); rOrders(); }
+function rOrders(){
+  eid('otb').innerHTML=[...db.orders].reverse().map(o=>{
+    const c=db.customers.find(x=>x.id===o.cid);
+    const paxCount=(o.pax||[]).length;
+    const segSummary=(o.segs||[]).map(g=>`${g.type}×${g.segments.length}`).join(' / ')||'—';
+    const firstDep=o.segs&&o.segs[0]&&o.segs[0].segments&&o.segs[0].segments[0]?o.segs[0].segments[0].depDate||'—':'—';
+    return `<tr><td class="am" style="color:var(--teal);font-size:11px">${o.no}</td><td><strong>${c?c.name:'—'}</strong></td>
+      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.desc||'—'}</td>
+      <td><span class="tg">${paxCount} pax</span></td>
+      <td style="font-size:11px">${segSummary}</td>
+      <td><span class="bx bx-${o.status}">${o.status}</span></td>
+      <td style="font-size:11px">${firstDep}</td>
+      <td><button class="btn bo sm" onclick="previewOrder('${o.id}')">View</button> <button class="btn bt sm" onclick="eOrder('${o.id}')">Edit</button> <button class="btn bd sm" onclick="dOrder('${o.id}')">Del</button></td></tr>`;
+  }).join('')||eRow(8,'No bookings yet');
+}
+function previewOrder(id){
+  const o=db.orders.find(x=>x.id===id); const c=db.customers.find(x=>x.id===o.cid);
+  let html=`<div class="pd"><div class="pd-hd"><div class="pd-co"><h2>${CO.name}</h2><p>${CO.addr}<br>${CO.tel} | ${CO.email}</p></div>
+  <div class="pd-tp"><span class="tl">BOOKING</span><div class="no">${o.no}</div></div></div>
+  <div class="pm"><div><div class="lb">Client</div><div class="vl"><strong>${c?c.name:'—'}</strong><br>${c&&c.phone?c.phone:''}</div></div>
+  <div><div class="lb">Details</div><div class="vl">Date: ${o.date||'—'}<br>Status: ${o.status}<br>${o.desc||''}</div></div></div>`;
+  if(o.pax&&o.pax.length){
+    html+=`<div style="margin-bottom:14px"><div style="font-size:11px;font-family:var(--fm);color:var(--gd);margin-bottom:6px;font-weight:600">PASSENGER LIST</div>
+    <table class="ptb"><thead><tr><th>Name</th><th>Type</th><th>Passport No.</th><th>Notes</th></tr></thead><tbody>
+    ${o.pax.map(p=>`<tr><td>${p.name||'—'}</td><td>${p.type}</td><td>${p.passport||'—'}</td><td>${p.notes||'—'}</td></tr>`).join('')}
+    </tbody></table></div>`;
+  }
+  (o.segs||[]).forEach(g=>{
+    html+=`<div style="margin-bottom:12px"><div style="font-size:11px;font-family:var(--fm);color:var(--teal);margin-bottom:6px;font-weight:600">${g.type.toUpperCase()}</div>
+    <table class="ptb"><thead><tr><th>From</th><th>To / Hotel</th><th>Flight / Ref</th><th>Dep / Check-in</th><th>Ret / Check-out</th><th>Notes</th></tr></thead><tbody>
+    ${g.segments.map(s=>`<tr><td>${s.dep||'—'}</td><td>${s.dest||'—'}</td><td>${s.flight||s.ref||'—'}</td><td>${s.depDate||'—'}</td><td>${s.retDate||'—'}</td><td>${s.notes||'—'}</td></tr>`).join('')}
+    </tbody></table></div>`;
+  });
+  if(o.notes) html+=`<div style="font-size:12px;color:#777;margin-top:8px">Notes: ${o.notes}</div>`;
+  html+=`<div class="pft">Generated by ${CO.name}</div></div>`;
+  eid('print-ct').innerHTML=html; openM('mo-print');
+}
+
+// ══════════════ DOCUMENT MODAL ══════════════
+let cDT=null; let dLI=[];
+function openDocM(t){
+  cDT=t; dLI=[{desc:'',qty:1,unit:'',up:0,amt:0}];
+  const titles={INV:'New Invoice',REC:'New Receipt',CN:'New Credit Note',DN:'New Debit Note',EO:'New Exchange Order'};
+  eid('doc-mt').textContent=titles[t]; eid('doc-fc').innerHTML=buildDocForm(t);
+  if(t==='INV') setTimeout(()=>{renderLI();},30);
+  openM('mo-doc');
+}
+function buildDocForm(t){
+  const co=db.customers.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  const io=db.invoices.map(i=>`<option value="${i.no}">${i.no}</option>`).join('');
+  const oo=db.orders.map(o=>`<option value="${o.no}">${o.no}${o.desc?' — '+o.desc.slice(0,20):''}</option>`).join('');
+  if(t==='INV') return `<div class="fg">
+    <div class="fld"><label>Client *</label><select id="df-c"><option value="">Select Client</option>${co}</select></div>
+    <div class="fld"><label>Ref. Booking</label><select id="df-o"><option value="">—</option>${oo}</select></div>
+    <div class="fld"><label>Invoice Date</label><input id="df-d" type="date" value="${td()}"></div>
+    <div class="fld"><label>Due Date</label><input id="df-du" type="date"></div>
+    <div class="fld ff"><label>Notes / Payment Terms</label><input id="df-n" placeholder="Payment within 7 days..."></div>
+    </div>
+    <div class="stl">Line Items</div>
+    <div class="li-hd"><div>Description</div><div>Qty</div><div>Unit</div><div>Unit Price (HK$)</div><div></div></div>
+    <div id="li-body"></div>
+    <button class="btn bo sm" onclick="addLI()" style="margin-top:5px">+ Add Item</button>
+    <div class="dt"><div class="dtb">
+      <div class="rw"><span>Subtotal</span><span id="li-sub">HK$0.00</span></div>
+      <div class="rw tot"><span>Total</span><span id="li-tot">HK$0.00</span></div>
+    </div></div>`;
+  if(t==='REC') return `<div class="fg">
+    <div class="fld"><label>Client *</label><select id="df-c"><option value="">Select Client</option>${co}</select></div>
+    <div class="fld"><label>Ref. Invoice</label><select id="df-ri"><option value="">—</option>${io}</select></div>
+    <div class="fld"><label>Payment Method</label><select id="df-pm"><option>Cash</option><option>Cheque</option><option>FPS</option><option>Bank Transfer</option><option>Credit Card</option></select></div>
+    <div class="fld"><label>Date</label><input id="df-d" type="date" value="${td()}"></div>
+    <div class="fld"><label>Amount Received *</label><input id="df-a" type="number" step="0.01" placeholder="0.00"></div>
+    <div class="fld ff"><label>Notes</label><input id="df-n" placeholder="Cheque no., reference..."></div></div>`;
+  if(t==='CN') return `<div class="fg">
+    <div class="fld"><label>Client *</label><select id="df-c"><option value="">Select Client</option>${co}</select></div>
+    <div class="fld"><label>Ref. Invoice</label><select id="df-ri"><option value="">—</option>${io}</select></div>
+    <div class="fld"><label>Date</label><input id="df-d" type="date" value="${td()}"></div>
+    <div class="fld"><label>Credit Amount *</label><input id="df-a" type="number" step="0.01" placeholder="0.00"></div>
+    <div class="fld ff"><label>Reason *</label><input id="df-r" placeholder="Tour cancellation refund..."></div></div>`;
+  if(t==='DN') return `<div class="fg">
+    <div class="fld"><label>Client *</label><select id="df-c"><option value="">Select Client</option>${co}</select></div>
+    <div class="fld"><label>Ref. Invoice</label><select id="df-ri"><option value="">—</option>${io}</select></div>
+    <div class="fld"><label>Date</label><input id="df-d" type="date" value="${td()}"></div>
+    <div class="fld"><label>Debit Amount *</label><input id="df-a" type="number" step="0.01" placeholder="0.00"></div>
+    <div class="fld ff"><label>Reason *</label><input id="df-r" placeholder="Fuel surcharge, hotel upgrade..."></div></div>`;
+  if(t==='EO') return `<div class="fg">
+    <div class="fld"><label>Supplier *</label><input id="df-sup" placeholder="Japan Airlines / Hotel XXX"></div>
+    <div class="fld"><label>Ref. Booking</label><select id="df-o"><option value="">—</option>${oo}</select></div>
+    <div class="fld"><label>Payment Method</label><select id="df-pm"><option>Bank Transfer</option><option>Cheque</option><option>Cash</option><option>Credit Card</option></select></div>
+    <div class="fld"><label>Date</label><input id="df-d" type="date" value="${td()}"></div>
+    <div class="fld"><label>Amount *</label><input id="df-a" type="number" step="0.01" placeholder="0.00"></div>
+    <div class="fld ff"><label>Service Description</label><input id="df-sv" placeholder="Flights, hotel, coach..."></div></div>`;
+}
+function renderLI(){
+  const b=eid('li-body'); if(!b)return;
+  b.innerHTML=dLI.map((li,i)=>`<div class="li-row">
+    <input value="${li.desc}" oninput="dLI[${i}].desc=this.value" placeholder="Flight tickets, hotel nights...">
+    <input type="number" value="${li.qty}" oninput="dLI[${i}].qty=parseFloat(this.value)||0;dLI[${i}].amt=dLI[${i}].qty*dLI[${i}].up;updTot()" min="0">
+    <input value="${li.unit}" oninput="dLI[${i}].unit=this.value" placeholder="pax/night">
+    <input type="number" value="${li.up}" oninput="dLI[${i}].up=parseFloat(this.value)||0;dLI[${i}].amt=dLI[${i}].qty*dLI[${i}].up;updTot()" step="0.01">
+    <button class="rl" onclick="dLI.length>1&&(dLI.splice(${i},1),renderLI())">&#215;</button>
+  </div>`).join(''); updTot();
+}
+function addLI(){ dLI.push({desc:'',qty:1,unit:'',up:0,amt:0}); renderLI(); }
+function updTot(){
+  const s=dLI.reduce((t,li)=>t+li.amt,0);
+  const a=eid('li-sub'),b=eid('li-tot');
+  if(a)a.textContent=fmt(s); if(b)b.textContent=fmt(s);
+}
+function saveDoc(){
+  const t=cDT; const dt=eid('df-d')?.value||td();
+  if(t==='INV'){
+    const cid=eid('df-c').value; if(!cid){alert('Please select a client');return;}
+    const amt=dLI.reduce((s,li)=>s+li.amt,0); if(amt<=0){alert('Please add at least one line item');return;}
+    db.invoices.push({id:'I'+Date.now(),no:nxt('INV'),cid,date:dt,dueDate:eid('df-du').value,
+      orderRef:eid('df-o').value,notes:eid('df-n').value,lineItems:[...dLI],amount:amt,paid:0,status:'unpaid'});
+    sDB(); closeM('mo-doc'); rInv();
+  } else if(t==='REC'){
+    const cid=eid('df-c').value; const amt=parseFloat(eid('df-a').value)||0;
+    if(!cid||!amt){alert('Please select a client and enter amount');return;}
+    const refInv=eid('df-ri').value;
+    db.receipts.push({id:'R'+Date.now(),no:nxt('REC'),cid,date:dt,refInv,
+      payMethod:eid('df-pm').value,notes:eid('df-n').value,amount:amt});
+    if(refInv){const inv=db.invoices.find(i=>i.no===refInv);if(inv){inv.paid=Math.min(inv.amount,inv.paid+amt);inv.status=inv.paid>=inv.amount?'paid':inv.paid>0?'partial':'unpaid';}}
+    sDB(); closeM('mo-doc'); rRec();
+  } else if(t==='CN'){
+    const cid=eid('df-c').value; const amt=parseFloat(eid('df-a').value)||0;
+    if(!cid||!amt){alert('Please select a client and enter amount');return;}
+    db.creditnotes.push({id:'CN'+Date.now(),no:nxt('CN'),cid,date:dt,refInv:eid('df-ri').value,reason:eid('df-r').value,amount:amt});
+    sDB(); closeM('mo-doc'); rCN();
+  } else if(t==='DN'){
+    const cid=eid('df-c').value; const amt=parseFloat(eid('df-a').value)||0;
+    if(!cid||!amt){alert('Please select a client and enter amount');return;}
+    db.debitnotes.push({id:'DN'+Date.now(),no:nxt('DN'),cid,date:dt,refInv:eid('df-ri').value,reason:eid('df-r').value,amount:amt});
+    sDB(); closeM('mo-doc'); rDN();
+  } else if(t==='EO'){
+    const sup=eid('df-sup').value.trim(); const amt=parseFloat(eid('df-a').value)||0;
+    if(!sup||!amt){alert('Please enter supplier and amount');return;}
+    db.eos.push({id:'EO'+Date.now(),no:nxt('EO'),supplier:sup,date:dt,orderRef:eid('df-o').value,
+      payMethod:eid('df-pm').value,service:eid('df-sv').value,amount:amt,status:'pending',settledDate:''});
+    sDB(); closeM('mo-doc'); rEO();
+  }
+}
+
+// ══════════════ RENDER TABLES ══════════════
+function rInv(){
+  eid('itb').innerHTML=[...db.invoices].reverse().map(i=>{
+    const c=db.customers.find(x=>x.id===i.cid); const bal=i.amount-i.paid;
+    return `<tr><td class="am" style="color:var(--teal);font-size:11px">${i.no}</td><td>${c?c.name:'—'}</td><td style="font-size:11px">${i.orderRef||'—'}</td>
+    <td><span class="bx bx-${i.status}">${i.status}</span></td><td class="am">${fmt(i.amount)}</td>
+    <td class="am pos">${fmt(i.paid)}</td><td class="am ${bal>0?'neg':''}">${fmt(bal)}</td><td style="font-size:11px">${i.date}</td>
+    <td><button class="btn bo sm" onclick="prvDoc('INV','${i.id}')">Preview</button> ${i.status!=='paid'?`<button class="btn bg sm" onclick="markPay('INV','${i.id}')">Receive</button>`:''} <button class="btn bd sm" onclick="dDoc('invoices','${i.id}',rInv)">Del</button></td></tr>`;
+  }).join('')||eRow(9,'No invoices yet');
+}
+function rRec(){
+  eid('rtb').innerHTML=[...db.receipts].reverse().map(r=>{
+    const c=db.customers.find(x=>x.id===r.cid);
+    return `<tr><td class="am" style="color:var(--grn);font-size:11px">${r.no}</td><td>${c?c.name:'—'}</td><td style="font-size:11px">${r.refInv||'—'}</td>
+    <td class="am pos">${fmt(r.amount)}</td><td><span class="tg">${r.payMethod}</span></td><td style="font-size:11px">${r.date}</td>
+    <td><button class="btn bo sm" onclick="prvDoc('REC','${r.id}')">Preview</button> <button class="btn bd sm" onclick="dDoc('receipts','${r.id}',rRec)">Del</button></td></tr>`;
+  }).join('')||eRow(7,'No receipts yet');
+}
+function rCN(){
+  eid('cntb').innerHTML=[...db.creditnotes].reverse().map(n=>{
+    const c=db.customers.find(x=>x.id===n.cid);
+    return `<tr><td class="am" style="color:var(--red);font-size:11px">${n.no}</td><td>${c?c.name:'—'}</td><td style="font-size:11px">${n.refInv||'—'}</td>
+    <td>${n.reason||'—'}</td><td class="am neg">${fmt(n.amount)}</td><td style="font-size:11px">${n.date}</td>
+    <td><button class="btn bo sm" onclick="prvDoc('CN','${n.id}')">Preview</button> <button class="btn bd sm" onclick="dDoc('creditnotes','${n.id}',rCN)">Del</button></td></tr>`;
+  }).join('')||eRow(7,'No credit notes yet');
+}
+function rDN(){
+  eid('dntb').innerHTML=[...db.debitnotes].reverse().map(n=>{
+    const c=db.customers.find(x=>x.id===n.cid);
+    return `<tr><td class="am" style="color:var(--gd);font-size:11px">${n.no}</td><td>${c?c.name:'—'}</td><td style="font-size:11px">${n.refInv||'—'}</td>
+    <td>${n.reason||'—'}</td><td class="am neu">${fmt(n.amount)}</td><td style="font-size:11px">${n.date}</td>
+    <td><button class="btn bo sm" onclick="prvDoc('DN','${n.id}')">Preview</button> <button class="btn bd sm" onclick="dDoc('debitnotes','${n.id}',rDN)">Del</button></td></tr>`;
+  }).join('')||eRow(7,'No debit notes yet');
+}
+function rEO(){
+  eid('eotb').innerHTML=[...db.eos].reverse().map(e=>{
+    return `<tr><td class="am" style="color:var(--teal);font-size:11px">${e.no}</td><td><strong>${e.supplier}</strong></td><td>${e.service||'—'}</td>
+    <td><span class="bx bx-${e.status}">${e.status}</span></td><td class="am">${fmt(e.amount)}</td><td style="font-size:11px">${e.orderRef||'—'}</td>
+    <td style="font-size:11px">${e.settledDate||'—'}</td>
+    <td><button class="btn bo sm" onclick="prvDoc('EO','${e.id}')">Preview</button> ${e.status==='pending'?`<button class="btn bg sm" onclick="markPay('EO','${e.id}')">Settle</button>`:''} <button class="btn bd sm" onclick="dDoc('eos','${e.id}',rEO)">Del</button></td></tr>`;
+  }).join('')||eRow(8,'No exchange orders yet');
+}
+function dDoc(col,id,fn){ if(!confirm('Delete this record?'))return; db[col]=db[col].filter(x=>x.id!==id); sDB(); fn(); }
+
+// ══════════════ REFUND APPLICATION ══════════════
+let rfLI=[]; let eRfId=null;
+function openRefundM(){
+  eRfId=null; rfLI=[{desc:'',qty:1,unit:'',amt:0}];
+  fillCustSel('rfc'); fillOrdSel('rfo'); fillInvSel('rfi');
+  eid('rfd').value=td(); eid('rfpd').value=''; eid('rfr').value=''; eid('rfn').value='';
+  eid('rfs').value='processing'; eid('rf-mt').textContent='New Refund Application';
+  renderRfLI(); openM('mo-refund');
+}
+function loadRefundInv(){
+  const cid=eid('rfc').value;
+  const io=db.invoices.filter(i=>i.cid===cid).map(i=>`<option value="${i.no}">${i.no}</option>`).join('');
+  eid('rfi').innerHTML='<option value="">-- None --</option>'+io;
+}
+function renderRfLI(){
+  eid('rf-li-body').innerHTML=rfLI.map((li,i)=>`<div class="li-row">
+    <input value="${li.desc}" oninput="rfLI[${i}].desc=this.value" placeholder="Flight ticket refund, hotel cancellation fee...">
+    <input type="number" value="${li.qty}" oninput="rfLI[${i}].qty=parseFloat(this.value)||0;updRfTot()" min="0">
+    <input value="${li.unit}" oninput="rfLI[${i}].unit=this.value" placeholder="pax/ticket">
+    <input type="number" value="${li.amt}" oninput="rfLI[${i}].amt=parseFloat(this.value)||0;updRfTot()" step="0.01" placeholder="Refund amount">
+    <button class="rl" onclick="rfLI.length>1&&(rfLI.splice(${i},1),renderRfLI())">&#215;</button>
+  </div>`).join(''); updRfTot();
+}
+function addRfLi(){ rfLI.push({desc:'',qty:1,unit:'',amt:0}); renderRfLI(); }
+function updRfTot(){ const t=rfLI.reduce((s,li)=>s+li.amt,0); eid('rf-tot').textContent=fmt(t); }
+function saveRefund(){
+  const cid=eid('rfc').value; if(!cid){alert('Please select a client');return;}
+  const totalAmt=rfLI.reduce((s,li)=>s+li.amt,0);
+  if(totalAmt<=0){alert('Please enter refund amount');return;}
+  const reason=eid('rfr').value.trim(); if(!reason){alert('Please enter reason for refund');return;}
+  const d={cid,orderRef:eid('rfo').value,invRef:eid('rfi').value,date:eid('rfd').value,
+    processDate:eid('rfpd').value,reason,status:eid('rfs').value,
+    lineItems:JSON.parse(JSON.stringify(rfLI)),amount:totalAmt,notes:eid('rfn').value};
+  if(eRfId){ Object.assign(db.refunds.find(x=>x.id===eRfId),d); }
+  else{ db.refunds.push({id:'RF'+Date.now(),no:nxt('RA'),...d}); }
+  sDB(); closeM('mo-refund'); rRefunds();
+}
+function eRefund(id){
+  const r=db.refunds.find(x=>x.id===id); eRfId=id;
+  rfLI=JSON.parse(JSON.stringify(r.lineItems||[{desc:'',qty:1,unit:'',amt:0}]));
+  fillCustSel('rfc',r.cid); fillOrdSel('rfo',r.orderRef); fillInvSel('rfi',r.invRef,r.cid);
+  eid('rfd').value=r.date||td(); eid('rfpd').value=r.processDate||'';
+  eid('rfr').value=r.reason||''; eid('rfn').value=r.notes||''; eid('rfs').value=r.status||'processing';
+  eid('rf-mt').textContent='Edit Refund Application';
+  renderRfLI(); openM('mo-refund');
+}
+function dRefund(id){ if(!confirm('Delete this refund application?'))return; db.refunds=db.refunds.filter(x=>x.id!==id); sDB(); rRefunds(); }
+function rRefunds(){
+  eid('rftb').innerHTML=[...db.refunds].reverse().map(r=>{
+    const c=db.customers.find(x=>x.id===r.cid);
+    return `<tr><td class="am" style="color:var(--pur);font-size:11px">${r.no}</td><td>${c?c.name:'—'}</td>
+    <td style="font-size:11px">${r.orderRef||r.invRef||'—'}</td>
+    <td><span class="bx bx-${r.status}">${r.status}</span></td>
+    <td class="am neg">${fmt(r.amount)}</td>
+    <td style="font-size:11px">${r.reason||'—'}</td><td style="font-size:11px">${r.date}</td>
+    <td><button class="btn bo sm" onclick="prvRefund('${r.id}')">Preview</button> <button class="btn bpu sm" onclick="eRefund('${r.id}')">Edit</button> <button class="btn bd sm" onclick="dRefund('${r.id}')">Del</button></td></tr>`;
+  }).join('')||eRow(8,'No refund applications yet');
+}
+
+// ══════════════ MARK PAID / SETTLED ══════════════
+let payTgt=null;
+function markPay(type,id){
+  payTgt={type,id};
+  if(type==='INV'){
+    const inv=db.invoices.find(x=>x.id===id); const c=db.customers.find(x=>x.id===inv.cid); const bal=inv.amount-inv.paid;
+    eid('pay-t').textContent='Record Payment';
+    eid('pay-ct').innerHTML=`<div style="margin-bottom:12px;font-size:13px;color:#666">Client: <strong>${c?c.name:'—'}</strong> | <strong>${inv.no}</strong><br>
+    <span style="font-family:var(--fm)">Invoice: ${fmt(inv.amount)} | Received: ${fmt(inv.paid)} | <span style="color:var(--red)">Balance: ${fmt(bal)}</span></span></div>
+    <div class="fg">
+      <div class="fld"><label>Amount Received</label><input id="pa-a" type="number" step="0.01" value="${bal}"></div>
+      <div class="fld"><label>Payment Method</label><select id="pa-m"><option>Cash</option><option>FPS</option><option>Bank Transfer</option><option>Cheque</option><option>Credit Card</option></select></div>
+      <div class="fld"><label>Date</label><input id="pa-d" type="date" value="${td()}"></div>
+      <div class="fld"><label>Notes</label><input id="pa-n" placeholder="Cheque no., reference..."></div>
+    </div>`;
+  } else {
+    const eo=db.eos.find(x=>x.id===id);
+    eid('pay-t').textContent='Confirm Settlement';
+    eid('pay-ct').innerHTML=`<div style="margin-bottom:12px;font-size:13px">Supplier: <strong>${eo.supplier}</strong><br>Amount: <strong class="am">${fmt(eo.amount)}</strong></div>
+    <div class="fld"><label>Settlement Date</label><input id="pa-d" type="date" value="${td()}"></div>`;
+  }
+  openM('mo-pay');
+}
+function confirmPay(){
+  if(!payTgt)return;
+  const{type,id}=payTgt;
+  if(type==='INV'){
+    const inv=db.invoices.find(x=>x.id===id);
+    const amt=parseFloat(eid('pa-a').value)||0;
+    db.receipts.push({id:'R'+Date.now(),no:nxt('REC'),cid:inv.cid,date:eid('pa-d').value,
+      refInv:inv.no,payMethod:eid('pa-m').value,notes:eid('pa-n')?.value||'',amount:amt});
+    inv.paid=Math.min(inv.amount,inv.paid+amt);
+    inv.status=inv.paid>=inv.amount?'paid':inv.paid>0?'partial':'unpaid';
+    sDB(); closeM('mo-pay'); rInv();
+  } else {
+    const eo=db.eos.find(x=>x.id===id);
+    eo.status='settled'; eo.settledDate=eid('pa-d').value;
+    sDB(); closeM('mo-pay'); rEO();
+  }
+}
+
+// ══════════════ PRINT PREVIEW ══════════════
+function prvDoc(type,id){
+  let html='';
+  if(type==='INV'){
+    const inv=db.invoices.find(x=>x.id===id); const c=db.customers.find(x=>x.id===inv.cid);
+    const rows=(inv.lineItems||[]).map(li=>`<tr><td>${li.desc}</td><td style="text-align:center">${li.qty}</td><td>${li.unit}</td><td style="text-align:right">HK$${Number(li.up||0).toFixed(2)}</td><td style="text-align:right">HK$${Number(li.amt||0).toFixed(2)}</td></tr>`).join('');
+    const bal=inv.amount-inv.paid;
+    html=`<div class="pd"><div class="pd-hd"><div class="pd-co"><h2>${CO.name}</h2><p>${CO.addr}<br>${CO.tel} | ${CO.email}</p></div>
+    <div class="pd-tp"><span class="tl">INVOICE</span><div class="no">${inv.no}</div></div></div>
+    <div class="pm"><div><div class="lb">Bill To</div><div class="vl"><strong>${c?c.name:'—'}</strong><br>${c&&c.phone?c.phone:''}<br>${c&&c.email?c.email:''}</div></div>
+    <div style="text-align:right"><div class="lb">Details</div><div class="vl">Date: ${inv.date}<br>${inv.dueDate?'Due: '+inv.dueDate+'<br>':''}${inv.orderRef?'Booking: '+inv.orderRef+'<br>':''}${inv.notes||''}</div></div></div>
+    <table class="ptb"><thead><tr><th>Description</th><th style="text-align:center">Qty</th><th>Unit</th><th style="text-align:right">Unit Price</th><th style="text-align:right">Amount</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="ptot"><div class="ptot-b"><div class="ptot-r"><span>Subtotal</span><span>HK$${inv.amount.toFixed(2)}</span></div>${inv.paid>0?`<div class="ptot-r"><span>Received</span><span style="color:var(--grn)">(HK$${inv.paid.toFixed(2)})</span></div>`:''}<div class="ptot-r gd"><span>Balance Due</span><span>HK$${bal.toFixed(2)}</span></div></div></div>
+    ${inv.status==='paid'?'<div style="text-align:right;margin-top:10px"><span class="pst">PAID</span></div>':''}
+    <div class="pft">Generated by ${CO.name} · ${inv.date}</div></div>`;
+  } else {
+    let rec,title,bodyHtml,stamp='';
+    if(type==='REC'){
+      rec=db.receipts.find(x=>x.id===id); title='RECEIPT'; const c=db.customers.find(x=>x.id===rec.cid);
+      bodyHtml=`<table class="ptb"><thead><tr><th>Description</th><th style="text-align:right">Amount</th></tr></thead><tbody><tr><td>Payment received — ${rec.payMethod}${rec.refInv?' (Ref: '+rec.refInv+')':''}</td><td style="text-align:right;font-weight:600">HK$${Number(rec.amount).toFixed(2)}</td></tr>${rec.notes?`<tr><td style="color:#888;font-size:11px">${rec.notes}</td><td></td></tr>`:''}</tbody></table>`;
+      stamp='<div style="text-align:right;margin-top:10px"><span class="pst">RECEIVED</span></div>';
+      html=buildSimplePrint(title,rec.no,rec.date,c,bodyHtml,stamp);
+    } else if(type==='CN'){
+      rec=db.creditnotes.find(x=>x.id===id); title='CREDIT NOTE'; const c=db.customers.find(x=>x.id===rec.cid);
+      bodyHtml=`<table class="ptb"><thead><tr><th>Reason</th><th style="text-align:right">Amount</th></tr></thead><tbody><tr><td>${rec.reason||'—'}${rec.refInv?' (Ref: '+rec.refInv+')':''}</td><td style="text-align:right;color:var(--red);font-weight:600">(HK$${Number(rec.amount).toFixed(2)})</td></tr></tbody></table>`;
+      stamp='<div style="text-align:right;margin-top:10px"><span class="pst r">CREDIT</span></div>';
+      html=buildSimplePrint(title,rec.no,rec.date,c,bodyHtml,stamp);
+    } else if(type==='DN'){
+      rec=db.debitnotes.find(x=>x.id===id); title='DEBIT NOTE'; const c=db.customers.find(x=>x.id===rec.cid);
+      bodyHtml=`<table class="ptb"><thead><tr><th>Reason</th><th style="text-align:right">Amount</th></tr></thead><tbody><tr><td>${rec.reason||'—'}${rec.refInv?' (Ref: '+rec.refInv+')':''}</td><td style="text-align:right;font-weight:600">HK$${Number(rec.amount).toFixed(2)}</td></tr></tbody></table>`;
+      html=buildSimplePrint(title,rec.no,rec.date,c,bodyHtml,stamp);
+    } else if(type==='EO'){
+      rec=db.eos.find(x=>x.id===id); title='EXCHANGE ORDER';
+      const fake={name:rec.supplier,phone:''};
+      bodyHtml=`<table class="ptb"><thead><tr><th>Service</th><th>Payment Method</th><th style="text-align:right">Amount</th></tr></thead><tbody><tr><td>${rec.service||'—'}</td><td>${rec.payMethod}</td><td style="text-align:right;font-weight:600">HK$${Number(rec.amount).toFixed(2)}</td></tr></tbody></table>`;
+      stamp=rec.status==='settled'?`<div style="text-align:right;margin-top:10px"><span class="pst">SETTLED ${rec.settledDate}</span></div>`:'';
+      html=buildSimplePrint(title,rec.no,rec.date,fake,bodyHtml,stamp);
+    }
+  }
+  eid('print-ct').innerHTML=html; openM('mo-print');
+}
+function buildSimplePrint(type,no,date,customer,bodyHtml,stamp){
+  return `<div class="pd"><div class="pd-hd"><div class="pd-co"><h2>${CO.name}</h2><p>${CO.addr}<br>${CO.tel} | ${CO.email}</p></div>
+  <div class="pd-tp"><span class="tl">${type}</span><div class="no">${no}</div></div></div>
+  <div class="pm"><div><div class="lb">To</div><div class="vl"><strong>${customer?customer.name:'—'}</strong><br>${customer&&customer.phone?customer.phone:''}</div></div>
+  <div style="text-align:right"><div class="lb">Date</div><div class="vl">${date}</div></div></div>
+  ${bodyHtml}${stamp}
+  <div class="pft">Generated by ${CO.name} · ${date}</div></div>`;
+}
+function prvRefund(id){
+  const r=db.refunds.find(x=>x.id===id); const c=db.customers.find(x=>x.id===r.cid);
+  const rows=r.lineItems.map(li=>`<tr><td>${li.desc}</td><td style="text-align:center">${li.qty}</td><td>${li.unit}</td><td style="text-align:right;color:var(--red)">(HK$${Number(li.amt).toFixed(2)})</td></tr>`).join('');
+  const statusColor={processing:'var(--pur)',approved:'var(--grn)',rejected:'var(--red)'};
+  const html=`<div class="pd"><div class="pd-hd"><div class="pd-co"><h2>${CO.name}</h2><p>${CO.addr}<br>${CO.tel} | ${CO.email}</p></div>
+  <div class="pd-tp"><span class="tl" style="font-size:18px">REFUND APPLICATION</span><div class="no">${r.no}</div></div></div>
+  <div class="pm">
+    <div><div class="lb">Client</div><div class="vl"><strong>${c?c.name:'—'}</strong><br>${c&&c.phone?c.phone:''}</div></div>
+    <div style="text-align:right"><div class="lb">Details</div><div class="vl">Application Date: ${r.date}<br>${r.orderRef?'Booking Ref: '+r.orderRef+'<br>':''}${r.invRef?'Invoice Ref: '+r.invRef+'<br>':''}Status: <span style="color:${statusColor[r.status]};font-weight:600">${r.status.toUpperCase()}</span></div></div>
+  </div>
+  <div style="margin-bottom:12px"><strong style="font-size:12px">Reason for Refund: </strong><span style="font-size:12px">${r.reason}</span></div>
+  <table class="ptb"><thead><tr><th>Refund Item</th><th style="text-align:center">Qty</th><th>Unit</th><th style="text-align:right">Refund Amount</th></tr></thead><tbody>${rows}</tbody></table>
+  <div class="ptot"><div class="ptot-b"><div class="ptot-r gd"><span>Total Refund</span><span style="color:var(--red)">(HK$${Number(r.amount).toFixed(2)})</span></div></div></div>
+  ${r.status==='approved'?'<div style="text-align:right;margin-top:10px"><span class="pst">APPROVED</span></div>':''}
+  ${r.status==='rejected'?'<div style="text-align:right;margin-top:10px"><span class="pst r">REJECTED</span></div>':''}
+  ${r.notes?`<div style="margin-top:12px;font-size:11px;color:#777">Notes: ${r.notes}</div>`:''}
+  <div class="pft">Generated by ${CO.name} · ${r.date}</div></div>`;
+  eid('print-ct').innerHTML=html; openM('mo-print');
+}
+
+// ══════════════ OUTSTANDING REPORT ══════════════
+function rptOS(){
+  const os=db.invoices.filter(i=>i.status!=='paid'); let tot=0;
+  eid('os-sum').innerHTML=`
+    <div class="rsc"><div class="lb">Unpaid Invoices</div><div class="vl" style="color:var(--red)">${os.length}</div></div>
+    <div class="rsc"><div class="lb">Total Invoiced</div><div class="vl am">${fmt(os.reduce((s,i)=>s+i.amount,0))}</div></div>
+    <div class="rsc"><div class="lb">Total Outstanding</div><div class="vl am neg">${fmt(os.reduce((s,i)=>s+(i.amount-i.paid),0))}</div></div>`;
+  eid('ostb').innerHTML=os.map(i=>{
+    const c=db.customers.find(x=>x.id===i.cid); const bal=i.amount-i.paid; tot+=bal;
+    const days=Math.floor((new Date()-new Date(i.date))/86400000);
+    return `<tr><td class="am" style="color:var(--teal);font-size:11px">${i.no}</td><td>${c?c.name:'—'}</td>
+    <td style="font-size:11px">${i.orderRef||'—'}</td><td style="font-size:11px">${i.date}</td>
+    <td class="am">${fmt(i.amount)}</td><td class="am pos">${fmt(i.paid)}</td>
+    <td class="am neg"><strong>${fmt(bal)}</strong></td>
+    <td style="color:${days>30?'var(--red)':'inherit'};font-family:var(--fm);font-size:12px">${days} days</td></tr>`;
+  }).join('')||eRow(8,'All invoices are fully settled ✓');
+  eid('os-tot').textContent=`Total Outstanding Balance: ${fmt(tot)}`;
+}
+
+// ══════════════ DATE-RANGE REPORTS ══════════════
+function rptDoc(type){
+  const cfgFull={
+    inv:{title:'Invoice Report',col:'invoices',
+      cols:['Invoice#','Client','Booking','Amount','Received','Balance','Status','Date'],
+      row:(i)=>{const c=db.customers.find(x=>x.id===i.cid);return[i.no,c?c.name:'—',i.orderRef||'—',fmt(i.amount),fmt(i.paid),fmt(i.amount-i.paid),`<span class="bx bx-${i.status}">${i.status}</span>`,i.date];},
+      sum:(data)=>[{lb:'Total Invoices',v:data.length},{lb:'Total Amount',v:fmt(data.reduce((s,i)=>s+i.amount,0))},{lb:'Total Received',v:fmt(data.reduce((s,i)=>s+i.paid,0))},{lb:'Outstanding',v:fmt(data.reduce((s,i)=>s+(i.amount-i.paid),0))}]},
+    rec:{title:'Receipt Report',col:'receipts',
+      cols:['Receipt#','Client','Ref Invoice','Amount','Payment Method','Date'],
+      row:(r)=>{const c=db.customers.find(x=>x.id===r.cid);return[r.no,c?c.name:'—',r.refInv||'—',fmt(r.amount),r.payMethod,r.date];},
+      sum:(data)=>[{lb:'Total Receipts',v:data.length},{lb:'Total Received',v:fmt(data.reduce((s,r)=>s+r.amount,0))}]},
+    cn:{title:'Credit Note Report',col:'creditnotes',
+      cols:['CN#','Client','Ref Invoice','Reason','Amount','Date'],
+      row:(n)=>{const c=db.customers.find(x=>x.id===n.cid);return[n.no,c?c.name:'—',n.refInv||'—',n.reason||'—',fmt(n.amount),n.date];},
+      sum:(data)=>[{lb:'Total Credit Notes',v:data.length},{lb:'Total Credit',v:fmt(data.reduce((s,n)=>s+n.amount,0))}]},
+    dn:{title:'Debit Note Report',col:'debitnotes',
+      cols:['DN#','Client','Ref Invoice','Reason','Amount','Date'],
+      row:(n)=>{const c=db.customers.find(x=>x.id===n.cid);return[n.no,c?c.name:'—',n.refInv||'—',n.reason||'—',fmt(n.amount),n.date];},
+      sum:(data)=>[{lb:'Total Debit Notes',v:data.length},{lb:'Total Charged',v:fmt(data.reduce((s,n)=>s+n.amount,0))}]},
+    eo:{title:'Exchange Order Report',col:'eos',
+      cols:['EO#','Supplier','Service','Status','Amount','Booking Ref','Settled Date'],
+      row:(e)=>[e.no,e.supplier,e.service||'—',`<span class="bx bx-${e.status}">${e.status}</span>`,fmt(e.amount),e.orderRef||'—',e.settledDate||'—'],
+      sum:(data)=>[{lb:'Total EOs',v:data.length},{lb:'Total Payable',v:fmt(data.reduce((s,e)=>s+e.amount,0))},{lb:'Settled',v:fmt(data.filter(e=>e.status==='settled').reduce((s,e)=>s+e.amount,0))},{lb:'Pending',v:fmt(data.filter(e=>e.status==='pending').reduce((s,e)=>s+e.amount,0))}]},
+    rf:{title:'Refund Application Report',col:'refunds',
+      cols:['RA#','Client','Booking','Status','Refund Amount','Reason','Date'],
+      row:(r)=>{const c=db.customers.find(x=>x.id===r.cid);return[r.no,c?c.name:'—',r.orderRef||r.invRef||'—',`<span class="bx bx-${r.status}">${r.status}</span>`,fmt(r.amount),r.reason||'—',r.date];},
+      sum:(data)=>[{lb:'Total Applications',v:data.length},{lb:'Total Refund Amount',v:fmt(data.reduce((s,r)=>s+r.amount,0))},{lb:'Approved',v:data.filter(r=>r.status==='approved').length},{lb:'Processing',v:data.filter(r=>r.status==='processing').length}]}
+  };
+  const c=cfgFull[type]; const ctId=`rpt-${type}-ct`;
+  const yr=new Date().getFullYear();
+  const firstOfYear=`${yr}-01-01`; const today2=td();
+  eid(ctId).innerHTML=`
+    <div class="rpt-bar">
+      <div class="rf"><label>From Date</label><input class="di" type="date" id="rpt-${type}-f" value="${firstOfYear}"></div>
+      <div class="rf"><label>To Date</label><input class="di" type="date" id="rpt-${type}-t" value="${today2}"></div>
+      <div class="rf"><label>Search</label><input class="sb0" style="min-width:150px" id="rpt-${type}-q" placeholder="Client, ref no..."></div>
+      <button class="btn bp" onclick="runRpt('${type}')">&#128269; Generate Report</button>
+      <button class="btn bo no-print" onclick="window.print()">&#128424; Print / PDF</button>
+    </div>
+    <div class="rpt-sum" id="rpt-${type}-sum" style="display:none"></div>
+    <div class="tw" id="rpt-${type}-tw" style="display:none">
+      <div class="ttr" style="padding:10px 13px" id="rpt-${type}-hdr"></div>
+      <table><thead><tr>${c.cols.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+      <tbody id="rpt-${type}-tb"></tbody></table>
+      <div id="rpt-${type}-tot" style="padding:11px 13px;border-top:1px solid var(--bdr);text-align:right;font-family:var(--fm);font-weight:600;font-size:13px"></div>
+    </div>`;
+}
+function runRpt(type){
+  const cfgFull={
+    inv:{col:'invoices',row:(i)=>{const c=db.customers.find(x=>x.id===i.cid);return[i.no,c?c.name:'—',i.orderRef||'—',fmt(i.amount),fmt(i.paid),fmt(i.amount-i.paid),`<span class="bx bx-${i.status}">${i.status}</span>`,i.date];},
+      sum:(data)=>[{lb:'Total Invoices',v:data.length},{lb:'Total Amount',v:fmt(data.reduce((s,i)=>s+i.amount,0))},{lb:'Total Received',v:fmt(data.reduce((s,i)=>s+i.paid,0))},{lb:'Outstanding',v:fmt(data.reduce((s,i)=>s+(i.amount-i.paid),0))}],tot:(data)=>`Total Received: <span class="am pos">${fmt(data.reduce((s,i)=>s+i.paid,0))}</span>`},
+    rec:{col:'receipts',row:(r)=>{const c=db.customers.find(x=>x.id===r.cid);return[r.no,c?c.name:'—',r.refInv||'—',fmt(r.amount),r.payMethod,r.date];},
+      sum:(data)=>[{lb:'Total Receipts',v:data.length},{lb:'Total Received',v:fmt(data.reduce((s,r)=>s+r.amount,0))}],tot:(data)=>`Total: <span class="am pos">${fmt(data.reduce((s,r)=>s+r.amount,0))}</span>`},
+    cn:{col:'creditnotes',row:(n)=>{const c=db.customers.find(x=>x.id===n.cid);return[n.no,c?c.name:'—',n.refInv||'—',n.reason||'—',fmt(n.amount),n.date];},
+      sum:(data)=>[{lb:'Total CNs',v:data.length},{lb:'Total Credit',v:fmt(data.reduce((s,n)=>s+n.amount,0))}],tot:(data)=>`Total Credit: <span class="am neg">${fmt(data.reduce((s,n)=>s+n.amount,0))}</span>`},
+    dn:{col:'debitnotes',row:(n)=>{const c=db.customers.find(x=>x.id===n.cid);return[n.no,c?c.name:'—',n.refInv||'—',n.reason||'—',fmt(n.amount),n.date];},
+      sum:(data)=>[{lb:'Total DNs',v:data.length},{lb:'Total Charged',v:fmt(data.reduce((s,n)=>s+n.amount,0))}],tot:(data)=>`Total: <span class="am neu">${fmt(data.reduce((s,n)=>s+n.amount,0))}</span>`},
+    eo:{col:'eos',row:(e)=>[e.no,e.supplier,e.service||'—',`<span class="bx bx-${e.status}">${e.status}</span>`,fmt(e.amount),e.orderRef||'—',e.settledDate||'—'],
+      sum:(data)=>[{lb:'Total EOs',v:data.length},{lb:'Total Payable',v:fmt(data.reduce((s,e)=>s+e.amount,0))},{lb:'Settled',v:fmt(data.filter(e=>e.status==='settled').reduce((s,e)=>s+e.amount,0))},{lb:'Pending',v:fmt(data.filter(e=>e.status==='pending').reduce((s,e)=>s+e.amount,0))}],tot:(data)=>`Pending: <span class="am neg">${fmt(data.filter(e=>e.status==='pending').reduce((s,e)=>s+e.amount,0))}</span>`},
+    rf:{col:'refunds',row:(r)=>{const c=db.customers.find(x=>x.id===r.cid);return[r.no,c?c.name:'—',r.orderRef||r.invRef||'—',`<span class="bx bx-${r.status}">${r.status}</span>`,fmt(r.amount),r.reason||'—',r.date];},
+      sum:(data)=>[{lb:'Applications',v:data.length},{lb:'Total Refund',v:fmt(data.reduce((s,r)=>s+r.amount,0))},{lb:'Approved',v:data.filter(r=>r.status==='approved').length},{lb:'Processing',v:data.filter(r=>r.status==='processing').length}],tot:(data)=>`Total Refund: <span class="am neg">${fmt(data.reduce((s,r)=>s+r.amount,0))}</span>`}
+  };
+  const c=cfgFull[type];
+  const from=eid(`rpt-${type}-f`).value;
+  const to=eid(`rpt-${type}-t`).value;
+  const q=(eid(`rpt-${type}-q`).value||'').toLowerCase();
+  let data=db[c.col].filter(item=>{const d=item.date||'';return d>=from&&d<=to;});
+  if(q) data=data.filter(item=>{
+    const cust=db.customers.find(x=>x.id===item.cid);
+    const cn=cust?cust.name.toLowerCase():'';
+    return cn.includes(q)||(item.no||'').toLowerCase().includes(q)||(item.supplier||'').toLowerCase().includes(q)||(item.reason||'').toLowerCase().includes(q)||(item.refInv||'').toLowerCase().includes(q)||(item.orderRef||'').toLowerCase().includes(q);
+  });
+  data.sort((a,b)=>(a.date||'')>(b.date||'')?1:-1);
+  const sumData=c.sum(data);
+  eid(`rpt-${type}-sum`).style.display='grid';
+  eid(`rpt-${type}-sum`).style.gridTemplateColumns=`repeat(${sumData.length},1fr)`;
+  eid(`rpt-${type}-sum`).innerHTML=sumData.map(s=>`<div class="rsc"><div class="lb">${s.lb}</div><div class="vl am">${s.v}</div></div>`).join('');
+  eid(`rpt-${type}-tw`).style.display='block';
+  eid(`rpt-${type}-hdr`).innerHTML=`<span style="font-family:var(--fs);font-weight:600;font-size:13px">Report Period: ${from} to ${to}</span> <span style="font-size:11px;color:#999;margin-left:8px">${data.length} record(s)</span>`;
+  const numCols=c.row({}||{}).length;
+  eid(`rpt-${type}-tb`).innerHTML=data.map(item=>`<tr>${c.row(item).map(v=>`<td style="font-size:12px">${v}</td>`).join('')}</tr>`).join('')||eRow(numCols,'No records found for this period');
+  eid(`rpt-${type}-tot`).innerHTML=c.tot(data);
+}
+
+// ══════════════ CLIENT HISTORY ══════════════
+function vHist(id){
+  const c=db.customers.find(x=>x.id===id);
+  eid('hist-t').textContent=`${c.name} — Transaction History`;
+  const ords=db.orders.filter(o=>o.cid===id);
+  const invs=db.invoices.filter(i=>i.cid===id);
+  const recs=db.receipts.filter(r=>r.cid===id);
+  const cns=db.creditnotes.filter(n=>n.cid===id);
+  const dns=db.debitnotes.filter(n=>n.cid===id);
+  const rfs=db.refunds.filter(r=>r.cid===id);
+  let html='<div class="ht">';
+  ords.forEach(o=>{
+    const pn=(o.pax||[]).map(p=>p.name).filter(Boolean).join(', ')||'—';
+    const ss=(o.segs||[]).map(g=>`${g.type}(${g.segments.length})`).join(', ')||'—';
+    html+=`<div class="hi"><div class="hd2" style="background:var(--teal)"></div><div class="hc"><div class="dr">&#9992; ${o.no}</div><div class="dd"><strong>${o.desc||'Booking'}</strong> &nbsp;<span class="bx bx-${o.status}">${o.status}</span></div><div class="dm">Passengers: ${pn}</div><div class="dm">Services: ${ss}</div></div></div>`;
+  });
+  invs.forEach(i=>{html+=`<div class="hi"><div class="hd2" style="background:var(--gold)"></div><div class="hc"><div class="dr">&#128196; ${i.no}</div><div class="dd">Invoice &nbsp;<span class="bx bx-${i.status}">${i.status}</span></div><div class="dm">Amount: ${fmt(i.amount)} | Received: ${fmt(i.paid)} | ${i.date}</div></div></div>`;});
+  recs.forEach(r=>{html+=`<div class="hi"><div class="hd2" style="background:var(--grn)"></div><div class="hc"><div class="dr">&#129534; ${r.no}</div><div class="dd">Receipt · ${r.payMethod}</div><div class="dm">${fmt(r.amount)} | ${r.date}</div></div></div>`;});
+  cns.forEach(n=>{html+=`<div class="hi"><div class="hd2" style="background:var(--red)"></div><div class="hc"><div class="dr">&#128203; ${n.no}</div><div class="dd">Credit Note · ${n.reason||'—'}</div><div class="dm">${fmt(n.amount)} | ${n.date}</div></div></div>`;});
+  dns.forEach(n=>{html+=`<div class="hi"><div class="hd2" style="background:var(--ink)"></div><div class="hc"><div class="dr">&#128209; ${n.no}</div><div class="dd">Debit Note · ${n.reason||'—'}</div><div class="dm">${fmt(n.amount)} | ${n.date}</div></div></div>`;});
+  rfs.forEach(r=>{html+=`<div class="hi"><div class="hd2" style="background:var(--pur)"></div><div class="hc"><div class="dr">&#8617; ${r.no}</div><div class="dd">Refund Application &nbsp;<span class="bx bx-${r.status}">${r.status}</span></div><div class="dm">Amount: ${fmt(r.amount)} | ${r.reason||'—'} | ${r.date}</div></div></div>`;});
+  if(!ords.length&&!invs.length&&!rfs.length) html+='<div class="es"><p>No transaction history</p></div>';
+  html+='</div>';
+  eid('hist-ct').innerHTML=html; openM('mo-hist');
+}
+
+// ══════════════ SEED DEMO DATA ══════════════
+if(!db.customers.length){
+  db.customers=[
+    {id:'C1',name:'Chan Tai Man',phone:'9123 4567',email:'chan@example.com',passport:'HK12345678',notes:'',createdAt:'2025-01-10'},
+    {id:'C2',name:'Lee Siu Ming',phone:'9876 5432',email:'lee@example.com',passport:'HK87654321',notes:'Vegetarian',createdAt:'2025-02-01'}
+  ];
+  db.orders=[
+    {id:'O1',no:'ORD2025-0001',cid:'C1',desc:'Japan Tokyo 5D4N Free & Easy',status:'confirmed',date:'2025-03-01',notes:'',
+     pax:[{name:'CHAN TAI MAN',type:'ADT',passport:'HK12345678',notes:''},{name:'CHAN SIU MEI',type:'ADT',passport:'HK11112222',notes:''}],
+     segs:[{type:'Flight',segments:[{dep:'HKG',dest:'TYO',flight:'CX 543',depDate:'2025-04-10',retDate:'2025-04-14',notes:'Economy Class'}]},
+           {type:'Hotel',segments:[{dep:'Tokyo',dest:'Shinjuku Grand Hotel',flight:'',ref:'HTLBK001',depDate:'2025-04-10',retDate:'2025-04-14',notes:'Superior Twin Room'}]}]},
+    {id:'O2',no:'ORD2025-0002',cid:'C2',desc:'Taiwan Taipei 3D + Japan Osaka 4D',status:'confirmed',date:'2025-03-05',notes:'',
+     pax:[{name:'LEE SIU MING',type:'ADT',passport:'HK87654321',notes:''},{name:'LEE SIU FA',type:'CHD',passport:'HK99887766',notes:'Child ticket'}],
+     segs:[{type:'Flight',segments:[{dep:'HKG',dest:'TPE',flight:'HX 101',depDate:'2025-05-01',retDate:'2025-05-03',notes:''},{dep:'TPE',dest:'OSA',flight:'BR 123',depDate:'2025-05-03',retDate:'2025-05-07',notes:''}]},
+           {type:'Hotel',segments:[{dep:'Taipei',dest:'Caesar Park Hotel',ref:'TPE001',depDate:'2025-05-01',retDate:'2025-05-03',notes:''},{dep:'Osaka',dest:'Osaka Bay Hotel',ref:'OSA001',depDate:'2025-05-03',retDate:'2025-05-07',notes:''}]}]}
+  ];
+  db.invoices=[
+    {id:'I1',no:'INV2025-0001',cid:'C1',date:'2025-03-01',dueDate:'2025-03-15',orderRef:'ORD2025-0001',notes:'',lineItems:[{desc:'Tokyo Flight Tickets ×2',qty:2,unit:'pax',up:5800,amt:11600},{desc:'Hotel (4 nights)',qty:4,unit:'night',up:1200,amt:4800}],amount:16400,paid:16400,status:'paid'},
+    {id:'I2',no:'INV2025-0002',cid:'C2',date:'2025-03-05',dueDate:'2025-03-20',orderRef:'ORD2025-0002',notes:'',lineItems:[{desc:'Taipei + Osaka Package ×2',qty:2,unit:'pax',up:4800,amt:9600}],amount:9600,paid:5000,status:'partial'}
+  ];
+  db.receipts=[
+    {id:'R1',no:'REC2025-0001',cid:'C1',date:'2025-03-10',refInv:'INV2025-0001',payMethod:'FPS',notes:'',amount:16400},
+    {id:'R2',no:'REC2025-0002',cid:'C2',date:'2025-03-08',refInv:'INV2025-0002',payMethod:'Cash',notes:'',amount:5000}
+  ];
+  db.eos=[
+    {id:'EO1',no:'EO2025-0001',supplier:'Cathay Pacific',date:'2025-03-01',orderRef:'ORD2025-0001',payMethod:'Bank Transfer',service:'CX543 Tickets ×2',amount:9800,status:'settled',settledDate:'2025-03-03'},
+    {id:'EO2',no:'EO2025-0002',supplier:'Shinjuku Grand Hotel',date:'2025-03-02',orderRef:'ORD2025-0001',payMethod:'Credit Card',service:'Hotel 4 nights',amount:4200,status:'pending',settledDate:''}
+  ];
+  db.refunds=[
+    {id:'RF1',no:'RA2025-0001',cid:'C2',orderRef:'ORD2025-0002',invRef:'INV2025-0002',date:'2025-03-12',processDate:'',reason:'Osaka leg cancelled by client',status:'processing',lineItems:[{desc:'Osaka Flight Refund ×2',qty:2,unit:'pax',amt:1800},{desc:'Osaka Hotel Cancellation Fee',qty:1,unit:'booking',amt:500}],amount:2300,notes:'Awaiting airline confirmation'}
+  ];
+  db.ctr={INV:2,REC:2,CN:0,DN:0,EO:2,ORD:2,RA:1};
+  sDB();
+}
+rDash();
+</script>
+</body>
+</html>
