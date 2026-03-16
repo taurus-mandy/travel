@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -769,23 +769,93 @@ function renderSegs(){
     </div>`).join('');
 }
 function renderSegRow(gi,si,s,type){
+  const isFlight=type==='Flight';
   const isHotel=type==='Hotel';
+  const fareHTML=isFlight?`
+    <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.25);border-radius:4px;padding:10px;margin-top:8px">
+      <div style="font-size:11px;font-family:var(--fm);color:var(--gd);margin-bottom:7px;font-weight:600">FARE BREAKDOWN</div>
+      <div style="display:grid;grid-template-columns:80px 60px 1fr 1fr;gap:7px;align-items:center;margin-bottom:5px">
+        <span style="font-size:10px;color:#888;font-family:var(--fm)">PAX TYPE</span>
+        <span style="font-size:10px;color:#888;font-family:var(--fm)">QTY</span>
+        <span style="font-size:10px;color:#888;font-family:var(--fm)">FARE/PAX (HKD)</span>
+        <span style="font-size:10px;color:#888;font-family:var(--fm)">SUBTOTAL</span>
+      </div>
+      <div style="display:grid;grid-template-columns:80px 60px 1fr 1fr;gap:7px;align-items:center;margin-bottom:5px">
+        <span style="font-size:12px;font-weight:600">Adult</span>
+        <input type="number" min="0" value="${s.adtQty||0}" oninput="oSegs[${gi}].segments[${si}].adtQty=parseInt(this.value)||0;updSegTotal(${gi},${si})" style="padding:4px 6px;border:1px solid var(--bdr);border-radius:3px;font-size:12px;width:100%;text-align:center">
+        <input type="number" min="0" step="0.01" value="${s.adtFare||''}" oninput="oSegs[${gi}].segments[${si}].adtFare=parseFloat(this.value)||0;updSegTotal(${gi},${si})" placeholder="0.00" style="padding:4px 6px;border:1px solid var(--bdr);border-radius:3px;font-size:12px;width:100%;text-align:right">
+        <span id="seg-adt-sub-${gi}-${si}" style="font-size:12px;font-family:var(--fm);color:var(--teal)">${s.adtQty&&s.adtFare?'HKD '+(s.adtQty*s.adtFare).toFixed(2):'-'}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:80px 60px 1fr 1fr;gap:7px;align-items:center;margin-bottom:5px">
+        <span style="font-size:12px;font-weight:600">Child</span>
+        <input type="number" min="0" value="${s.chdQty||0}" oninput="oSegs[${gi}].segments[${si}].chdQty=parseInt(this.value)||0;updSegTotal(${gi},${si})" style="padding:4px 6px;border:1px solid var(--bdr);border-radius:3px;font-size:12px;width:100%;text-align:center">
+        <input type="number" min="0" step="0.01" value="${s.chdFare||''}" oninput="oSegs[${gi}].segments[${si}].chdFare=parseFloat(this.value)||0;updSegTotal(${gi},${si})" placeholder="0.00" style="padding:4px 6px;border:1px solid var(--bdr);border-radius:3px;font-size:12px;width:100%;text-align:right">
+        <span id="seg-chd-sub-${gi}-${si}" style="font-size:12px;font-family:var(--fm);color:var(--teal)">${s.chdQty&&s.chdFare?'HKD '+(s.chdQty*s.chdFare).toFixed(2):'-'}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:80px 60px 1fr 1fr;gap:7px;align-items:center;margin-bottom:8px">
+        <span style="font-size:12px;font-weight:600">Infant</span>
+        <input type="number" min="0" value="${s.infQty||0}" oninput="oSegs[${gi}].segments[${si}].infQty=parseInt(this.value)||0;updSegTotal(${gi},${si})" style="padding:4px 6px;border:1px solid var(--bdr);border-radius:3px;font-size:12px;width:100%;text-align:center">
+        <input type="number" min="0" step="0.01" value="${s.infFare||''}" oninput="oSegs[${gi}].segments[${si}].infFare=parseFloat(this.value)||0;updSegTotal(${gi},${si})" placeholder="0.00" style="padding:4px 6px;border:1px solid var(--bdr);border-radius:3px;font-size:12px;width:100%;text-align:right">
+        <span id="seg-inf-sub-${gi}-${si}" style="font-size:12px;font-family:var(--fm);color:var(--teal)">${s.infQty&&s.infFare?'HKD '+(s.infQty*s.infFare).toFixed(2):'-'}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;border-top:1px solid rgba(201,168,76,0.3);padding-top:8px">
+        <div class="seg-field"><label>Tax / Surcharge (per pax)</label><input type="number" min="0" step="0.01" value="${s.tax||''}" oninput="oSegs[${gi}].segments[${si}].tax=parseFloat(this.value)||0;updSegTotal(${gi},${si})" placeholder="0.00" style="padding:5px 7px;border:1px solid var(--bdr);border-radius:3px;font-size:12px;font-family:var(--fn);color:var(--ink);width:100%"></div>
+        <div class="seg-field"><label>Segment Total (HKD)</label><input readonly id="seg-tot-${gi}-${si}" value="${s.segTotal?Number(s.segTotal).toFixed(2):''}" style="padding:5px 7px;border:1px solid var(--bdr);border-radius:3px;font-size:13px;font-family:var(--fm);color:var(--gd);font-weight:600;background:var(--pw);width:100%;text-align:right"></div>
+      </div>
+    </div>`:'';
   return `<div style="background:var(--pw);border:1px solid var(--bdr);border-radius:4px;padding:10px;margin-bottom:8px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
-      <span style="font-size:11px;font-family:var(--fm);color:var(--gd)">Segment ${si+1}</span>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-size:11px;font-family:var(--fm);color:var(--gd);font-weight:600">Segment ${si+1}</span>
       ${si>0?`<button class="rl" onclick="oSegs[${gi}].segments.splice(${si},1);renderSegs()">&#215;</button>`:'<span></span>'}
     </div>
     <div class="seg-grid">
-      <div class="seg-field"><label>${isHotel?'City / Destination':'Origin'}</label><input value="${s.dep}" oninput="oSegs[${gi}].segments[${si}].dep=this.value" placeholder="${isHotel?'Tokyo':'HKG'}"></div>
-      <div class="seg-field"><label>${isHotel?'Hotel Name':'Destination'}</label><input value="${s.dest}" oninput="oSegs[${gi}].segments[${si}].dest=this.value" placeholder="${isHotel?'Shinjuku Grand Hotel':'TYO'}"></div>
-      <div class="seg-field"><label>${isHotel?'Confirmation No.':'Flight / Ref No.'}</label><input value="${s.flight||s.ref||''}" oninput="oSegs[${gi}].segments[${si}].flight=this.value;oSegs[${gi}].segments[${si}].ref=this.value" placeholder="${isHotel?'HTLBK001':'CX 543'}"></div>
+      <div class="seg-field"><label>${isHotel?'City / Destination':'Origin'}</label><input value="${s.dep||''}" oninput="oSegs[${gi}].segments[${si}].dep=this.value" placeholder="${isHotel?'Tokyo':'HKG'}" style="padding:5px 7px;border:1px solid var(--bdr);border-radius:3px;font-size:12px;font-family:var(--fn);color:var(--ink);width:100%"></div>
+      <div class="seg-field"><label>${isHotel?'Hotel Name':'Destination'}</label><input value="${s.dest||''}" oninput="oSegs[${gi}].segments[${si}].dest=this.value" placeholder="${isHotel?'Shinjuku Grand Hotel':'TYO'}" style="padding:5px 7px;border:1px solid var(--bdr);border-radius:3px;font-size:12px;font-family:var(--fn);color:var(--ink);width:100%"></div>
+      <div class="seg-field"><label>${isFlight?'Flight No.':isHotel?'Confirmation No.':'Reference No.'}</label><input value="${s.flight||s.ref||''}" oninput="oSegs[${gi}].segments[${si}].flight=this.value;oSegs[${gi}].segments[${si}].ref=this.value" placeholder="${isFlight?'CX 543':isHotel?'HTLBK001':'REF001'}" style="padding:5px 7px;border:1px solid var(--bdr);border-radius:3px;font-size:12px;font-family:var(--fn);color:var(--ink);width:100%"></div>
     </div>
-    <div class="seg-grid">
-      <div class="seg-field"><label>${isHotel?'Check-in Date':'Departure Date'}</label><input type="date" value="${s.depDate}" oninput="oSegs[${gi}].segments[${si}].depDate=this.value"></div>
-      <div class="seg-field"><label>${isHotel?'Check-out Date':'Return Date'}</label><input type="date" value="${s.retDate}" oninput="oSegs[${gi}].segments[${si}].retDate=this.value"></div>
-      <div class="seg-field"><label>Notes</label><input value="${s.notes||''}" oninput="oSegs[${gi}].segments[${si}].notes=this.value" placeholder="Remarks..."></div>
+    <div class="seg-grid" style="margin-top:7px">
+      <div class="seg-field"><label>${isHotel?'Check-in Date':'Departure Date'}</label><input type="date" value="${s.depDate||''}" oninput="oSegs[${gi}].segments[${si}].depDate=this.value" style="padding:5px 7px;border:1px solid var(--bdr);border-radius:3px;font-size:12px;font-family:var(--fn);color:var(--ink);width:100%"></div>
+      <div class="seg-field"><label>${isHotel?'Check-out Date':'Return Date'}</label><input type="date" value="${s.retDate||''}" oninput="oSegs[${gi}].segments[${si}].retDate=this.value" style="padding:5px 7px;border:1px solid var(--bdr);border-radius:3px;font-size:12px;font-family:var(--fn);color:var(--ink);width:100%"></div>
+      ${isFlight?`<div class="seg-field"><label>Class</label><select onchange="oSegs[${gi}].segments[${si}].cls=this.value" style="padding:5px 7px;border:1px solid var(--bdr);border-radius:3px;font-size:12px;font-family:var(--fn);color:var(--ink);width:100%"><option value="ECONOMY"${(s.cls||'ECONOMY')==='ECONOMY'?' selected':''}>Economy</option><option value="PREMIUM ECONOMY"${s.cls==='PREMIUM ECONOMY'?' selected':''}>Premium Economy</option><option value="BUSINESS"${s.cls==='BUSINESS'?' selected':''}>Business</option><option value="FIRST"${s.cls==='FIRST'?' selected':''}>First</option></select></div>`:`<div class="seg-field"><label>Remarks</label><input value="${s.notes||''}" oninput="oSegs[${gi}].segments[${si}].notes=this.value" placeholder="Notes..." style="padding:5px 7px;border:1px solid var(--bdr);border-radius:3px;font-size:12px;font-family:var(--fn);color:var(--ink);width:100%"></div>`}
     </div>
+    ${fareHTML}
   </div>`;
+}
+
+function updSegTotal(gi,si){
+  const s=oSegs[gi].segments[si];
+  const adtSub=(s.adtQty||0)*(s.adtFare||0);
+  const chdSub=(s.chdQty||0)*(s.chdFare||0);
+  const infSub=(s.infQty||0)*(s.infFare||0);
+  const totalPax=(s.adtQty||0)+(s.chdQty||0)+(s.infQty||0);
+  const taxTotal=(s.tax||0)*totalPax;
+  s.segTotal=adtSub+chdSub+infSub+taxTotal;
+  const totEl=document.getElementById(`seg-tot-${gi}-${si}`);
+  if(totEl) totEl.value=s.segTotal.toFixed(2);
+  const adtEl=document.getElementById(`seg-adt-sub-${gi}-${si}`);
+  if(adtEl) adtEl.textContent=adtSub>0?'HKD '+adtSub.toFixed(2):'-';
+  const chdEl=document.getElementById(`seg-chd-sub-${gi}-${si}`);
+  if(chdEl) chdEl.textContent=chdSub>0?'HKD '+chdSub.toFixed(2):'-';
+  const infEl=document.getElementById(`seg-inf-sub-${gi}-${si}`);
+  if(infEl) infEl.textContent=infSub>0?'HKD '+infSub.toFixed(2):'-';
+}
+function calcSegTotalVal(fares){
+  if(!fares) return 0;
+  const adt=((fares.adt&&fares.adt.fare||0)+(fares.adt&&fares.adt.tax||0))*(fares.adtQty||0);
+  const chd=((fares.chd&&fares.chd.fare||0)+(fares.chd&&fares.chd.tax||0))*(fares.chdQty||0);
+  const inf=((fares.inf&&fares.inf.fare||0)+(fares.inf&&fares.inf.tax||0))*(fares.infQty||0);
+  return adt+chd+inf;
+}
+function calcSegTotal(gi,si){
+  const seg=oSegs[gi]&&oSegs[gi].segments&&oSegs[gi].segments[si];
+  if(!seg) return;
+  const total=calcSegTotalVal(seg.fares);
+  const el=document.getElementById('seg-tot-'+gi+'-'+si);
+  if(el) el.textContent=fmt(total);
+  // Update subtotals display
+  const adtSub=((seg.fares&&seg.fares.adt&&seg.fares.adt.fare||0)+(seg.fares&&seg.fares.adt&&seg.fares.adt.tax||0))*(seg.fares&&seg.fares.adtQty||0);
+  const chdSub=((seg.fares&&seg.fares.chd&&seg.fares.chd.fare||0)+(seg.fares&&seg.fares.chd&&seg.fares.chd.tax||0))*(seg.fares&&seg.fares.chdQty||0);
+  const infSub=((seg.fares&&seg.fares.inf&&seg.fares.inf.fare||0)+(seg.fares&&seg.fares.inf&&seg.fares.inf.tax||0))*(seg.fares&&seg.fares.infQty||0);
 }
 function addSegGroup(){ oSegs.push({type:'Flight',segments:[{dep:'',dest:'',depDate:'',retDate:'',flight:'',ref:'',notes:''}]}); renderSegs(); }
 function saveOrder(){
@@ -844,6 +914,22 @@ function previewOrder(id){
   eid('print-ct').innerHTML=html; openM('mo-print');
 }
 
+// ══════════════ EO HELPERS ══════════════
+function calcEOTotal(){
+  const g=(id)=>parseFloat(eid(id)?.value)||0;
+  const gi=(id)=>parseInt(eid(id)?.value)||0;
+  const adt=(g('eo-adt-fare')+g('eo-adt-tax'))*gi('eo-adt-qty');
+  const chd=(g('eo-chd-fare')+g('eo-chd-tax'))*gi('eo-chd-qty');
+  const inf=(g('eo-inf-fare')+g('eo-inf-tax'))*gi('eo-inf-qty');
+  const oth=(g('eo-oth-fare')+g('eo-oth-surcharge'))*Math.max(gi('eo-oth-qty'),1);
+  const total=adt+chd+inf+oth;
+  const el=eid('eo-total-display');
+  if(el) el.textContent=fmt(total);
+}
+function toggleEOFields(type){
+  const fl=eid('eo-flight-fields');
+  if(fl) fl.style.display=type==='Flight'?'grid':'none';
+}
 // ══════════════ DOCUMENT MODAL ══════════════
 let cDT=null; let dLI=[];
 function openDocM(t){
@@ -900,20 +986,53 @@ FPS: 101315810</textarea></div>
   if(t==='EO'){
     const supplierList=db.suppliers&&db.suppliers.length?db.suppliers.map(s=>`<option value="${s}">${s}</option>`).join(''):'';
     return `<div class="fg">
-    <div class="fld"><label>Supplier *</label>
-      <div style="display:flex;gap:6px">
-        <select id="df-sup-sel" onchange="if(this.value){eid('df-sup').value=this.value}" style="flex:1;padding:7px 9px;border:1px solid var(--bdr);border-radius:4px;background:var(--paper);font-family:var(--fn);font-size:13px">
-          <option value="">-- Select or type below --</option>${supplierList}
-        </select>
-      </div>
-      <input id="df-sup" placeholder="Or type new supplier name..." style="margin-top:5px;width:100%;padding:7px 9px;border:1px solid var(--bdr);border-radius:4px;background:var(--paper);font-family:var(--fn);font-size:13px">
+    <div class="fld" style="grid-column:1/-1"><label>Supplier *</label>
+      <select id="df-sup-sel" onchange="if(this.value){eid('df-sup').value=this.value}" style="width:100%;padding:7px 9px;border:1px solid var(--bdr);border-radius:4px;background:var(--paper);font-family:var(--fn);font-size:13px;margin-bottom:5px">
+        <option value="">-- Select existing supplier --</option>${supplierList}
+      </select>
+      <input id="df-sup" placeholder="Or type new supplier name..." style="width:100%;padding:7px 9px;border:1px solid var(--bdr);border-radius:4px;background:var(--paper);font-family:var(--fn);font-size:13px;color:var(--ink)">
+    </div>
+    <div class="fld"><label>Service Type</label>
+      <select id="df-sv-type" style="width:100%;padding:7px 9px;border:1px solid var(--bdr);border-radius:4px;background:var(--paper);font-family:var(--fn);font-size:13px">
+        <option value="Flight Ticket">Flight Ticket</option>
+        <option value="Hotel">Hotel</option>
+        <option value="Coach / Transfer">Coach / Transfer</option>
+        <option value="Travel Insurance">Travel Insurance</option>
+        <option value="Visa">Visa</option>
+        <option value="Miscellaneous">Miscellaneous</option>
+      </select>
     </div>
     <div class="fld"><label>Ref. Booking</label><select id="df-o"><option value="">—</option>${oo}</select></div>
-    <div class="fld"><label>Payment Method</label><select id="df-pm"><option>Bank Transfer</option><option>Cheque</option><option>Cash</option><option>Credit Card</option></select></div>
     <div class="fld"><label>Date</label><input id="df-d" type="date" value="${td()}"></div>
-    <div class="fld"><label>Amount *</label><input id="df-a" type="number" step="0.01" placeholder="0.00"></div>
-    <div class="fld ff"><label>Service Description</label><input id="df-sv" placeholder="Flights, hotel, coach..."></div></div>`;}
-}
+    <div class="fld"><label>Flight No.</label><input id="df-flight" placeholder="CX 543"></div>
+    <div class="fld"><label>Ticket No.</label><input id="df-ticket" placeholder="160-XXXXXXXXX"></div>
+    <div class="fld"><label>Routing</label><input id="df-routing" placeholder="HKG/TYO/HKG"></div>
+    <div class="fld"><label>Departure Date</label><input id="df-depdate" type="date"></div>
+    <div class="fld"><label>Return Date</label><input id="df-retdate" type="date"></div>
+    <div class="fld"><label>Class</label>
+      <select id="df-cls" style="width:100%;padding:7px 9px;border:1px solid var(--bdr);border-radius:4px;background:var(--paper);font-family:var(--fn);font-size:13px">
+        <option value="ECONOMY">Economy</option><option value="PREMIUM ECONOMY">Premium Economy</option>
+        <option value="BUSINESS">Business</option><option value="FIRST">First</option>
+      </select>
+    </div>
+    <div class="fld"><label>Payment Method</label>
+      <select id="df-pm" style="width:100%;padding:7px 9px;border:1px solid var(--bdr);border-radius:4px;background:var(--paper);font-family:var(--fn);font-size:13px">
+        <option>Bank Transfer</option><option>Cheque</option><option>Cash</option><option>Credit Card</option>
+      </select>
+    </div>
+    </div>
+    <div class="stl">Cost Breakdown</div>
+    <div class="fg">
+    <div class="fld"><label>Adult Cost Fare (HKD)</label><input id="df-adt-fare" type="number" step="0.01" placeholder="0.00" oninput="calcEOTotal()"></div>
+    <div class="fld"><label>Adult Qty</label><input id="df-adt-qty" type="number" min="0" value="0" oninput="calcEOTotal()"></div>
+    <div class="fld"><label>Child Cost Fare (HKD)</label><input id="df-chd-fare" type="number" step="0.01" placeholder="0.00" oninput="calcEOTotal()"></div>
+    <div class="fld"><label>Child Qty</label><input id="df-chd-qty" type="number" min="0" value="0" oninput="calcEOTotal()"></div>
+    <div class="fld"><label>Infant Cost Fare (HKD)</label><input id="df-inf-fare" type="number" step="0.01" placeholder="0.00" oninput="calcEOTotal()"></div>
+    <div class="fld"><label>Infant Qty</label><input id="df-inf-qty" type="number" min="0" value="0" oninput="calcEOTotal()"></div>
+    <div class="fld"><label>Tax / Surcharge (per pax)</label><input id="df-tax" type="number" step="0.01" placeholder="0.00" oninput="calcEOTotal()"></div>
+    <div class="fld"><label>Total Amount (HKD)</label><input id="df-a" type="number" step="0.01" placeholder="0.00" style="font-weight:600;color:var(--gd)"></div>
+    <div class="fld ff"><label>Service Description</label><input id="df-sv" placeholder="Flight tickets, hotel, coach..."></div>
+    </div>`;}
 function renderLI(){
   const b=eid('li-body'); if(!b)return;
   b.innerHTML=dLI.map((li,i)=>`<div class="li-row">
@@ -929,6 +1048,18 @@ function updTot(){
   const s=dLI.reduce((t,li)=>t+li.amt,0);
   const a=eid('li-sub'),b=eid('li-tot');
   if(a)a.textContent=fmt(s); if(b)b.textContent=fmt(s);
+}
+function calcEOTotal(){
+  const adtFare=parseFloat(eid('df-adt-fare')?.value)||0;
+  const adtQty=parseInt(eid('df-adt-qty')?.value)||0;
+  const chdFare=parseFloat(eid('df-chd-fare')?.value)||0;
+  const chdQty=parseInt(eid('df-chd-qty')?.value)||0;
+  const infFare=parseFloat(eid('df-inf-fare')?.value)||0;
+  const infQty=parseInt(eid('df-inf-qty')?.value)||0;
+  const tax=parseFloat(eid('df-tax')?.value)||0;
+  const totalPax=adtQty+chdQty+infQty;
+  const total=(adtFare*adtQty)+(chdFare*chdQty)+(infFare*infQty)+(tax*totalPax);
+  const el=eid('df-a'); if(el) el.value=total.toFixed(2);
 }
 function saveDoc(){
   const t=cDT; const dt=eid('df-d')?.value||td();
@@ -958,10 +1089,33 @@ function saveDoc(){
     db.debitnotes.push({id:'DN'+Date.now(),no:nxt('DN'),cid,date:dt,refInv:eid('df-ri').value,reason:eid('df-r').value,amount:amt});
     sDB(); closeM('mo-doc'); rDN();
   } else if(t==='EO'){
-    const sup=eid('df-sup').value.trim(); const amt=parseFloat(eid('df-a').value)||0;
-    if(!sup||!amt){alert('Please enter supplier and amount');return;}
-    db.eos.push({id:'EO'+Date.now(),no:nxt('EO'),supplier:sup,date:dt,orderRef:eid('df-o').value,
-      payMethod:eid('df-pm').value,service:eid('df-sv').value,amount:amt,status:'pending',settledDate:''});
+    const sup=(eid('df-sup')&&eid('df-sup').value.trim())||'';
+    if(!sup){alert('Please enter supplier name');return;}
+    const adtTotal=((parseFloat(eid('eo-adt-fare')?.value)||0)+(parseFloat(eid('eo-adt-tax')?.value)||0))*(parseInt(eid('eo-adt-qty')?.value)||0);
+    const chdTotal=((parseFloat(eid('eo-chd-fare')?.value)||0)+(parseFloat(eid('eo-chd-tax')?.value)||0))*(parseInt(eid('eo-chd-qty')?.value)||0);
+    const infTotal=((parseFloat(eid('eo-inf-fare')?.value)||0)+(parseFloat(eid('eo-inf-tax')?.value)||0))*(parseInt(eid('eo-inf-qty')?.value)||0);
+    const othTotal=((parseFloat(eid('eo-oth-fare')?.value)||0)+(parseFloat(eid('eo-oth-surcharge')?.value)||0))*(parseInt(eid('eo-oth-qty')?.value)||1);
+    const amt=adtTotal+chdTotal+infTotal+othTotal;
+    if(amt<=0){alert('Please enter cost amounts');return;}
+    const eoData={id:'EO'+Date.now(),no:nxt('EO'),supplier:sup,date:dt,
+      orderRef:eid('df-o').value,payMethod:eid('df-pm').value,
+      serviceType:eid('df-stype')?.value||'Flight',
+      service:eid('df-sv')?.value||'',
+      ticketNo:eid('df-tkt')?.value||'',
+      flightNo:eid('df-flt')?.value||'',
+      routing:eid('df-routing')?.value||'',
+      depDate:eid('df-dep')?.value||'',
+      retDate:eid('df-ret')?.value||'',
+      cls:eid('df-cls')?.value||'Economy',
+      paxName:eid('df-paxname')?.value||'',
+      fares:{
+        adt:{qty:parseInt(eid('eo-adt-qty')?.value)||0,fare:parseFloat(eid('eo-adt-fare')?.value)||0,tax:parseFloat(eid('eo-adt-tax')?.value)||0},
+        chd:{qty:parseInt(eid('eo-chd-qty')?.value)||0,fare:parseFloat(eid('eo-chd-fare')?.value)||0,tax:parseFloat(eid('eo-chd-tax')?.value)||0},
+        inf:{qty:parseInt(eid('eo-inf-qty')?.value)||0,fare:parseFloat(eid('eo-inf-fare')?.value)||0,tax:parseFloat(eid('eo-inf-tax')?.value)||0},
+        oth:{qty:parseInt(eid('eo-oth-qty')?.value)||0,cost:parseFloat(eid('eo-oth-fare')?.value)||0,surcharge:parseFloat(eid('eo-oth-surcharge')?.value)||0}
+      },
+      amount:amt,status:'pending',settledDate:''};
+    db.eos.push(eoData);
     if(!db.suppliers) db.suppliers=[];
     if(!db.suppliers.includes(sup)) db.suppliers.push(sup);
     sDB(); closeM('mo-doc'); rEO();
@@ -1142,9 +1296,9 @@ function buildBMTDoc(opts){
   let fareHTML='';
   if(fareRows&&fareRows.length){
     fareHTML=`<table class="pd-fare">
-    <thead><tr><td></td><td style="font-weight:700;padding-bottom:4px">Unit Price</td><td></td><td></td><td style="font-weight:700;text-align:right;padding-bottom:4px">Unit (x)</td><td style="font-weight:700;text-align:right;padding-bottom:4px">Total</td></tr></thead>
-    <tbody>${fareRows.map(r=>`<tr><td class="fare-label">${r.label||'Fare'}</td><td>HKD &nbsp; ${Number(r.unitPrice).toFixed(2)}</td><td></td><td></td><td style="text-align:right">${r.qty} ${r.unit||'Adult'}</td><td style="text-align:right">${Number(r.amount).toFixed(2)}</td></tr>`).join('')}
-    <tr><td colspan="4"></td><td style="text-align:right;border-top:1px solid #333;padding-top:4px"><strong>Total:</strong></td><td style="text-align:right;border-top:1px solid #333;padding-top:4px"><strong>HKD &nbsp; ${Number(totalAmt).toFixed(2)}</strong></td></tr>
+    <thead><tr><td></td><td style="font-weight:700;padding-bottom:4px">Unit Price</td><td style="font-weight:700;padding-bottom:4px">Tax</td><td></td><td style="font-weight:700;text-align:right;padding-bottom:4px">Unit (x)</td><td style="font-weight:700;text-align:right;padding-bottom:4px">Total</td></tr></thead>
+    <tbody>${fareRows.map(r=>`<tr><td class="fare-label">${r.label||'Fare'}</td><td>HKD &nbsp; ${Number(r.unitPrice||0).toFixed(2)}</td><td>HKD &nbsp; ${Number(r.tax?(r.tax/Math.max(r.qty,1)):0).toFixed(2)}</td><td></td><td style="text-align:right">${r.qty} ${r.unit||'Adult'}</td><td style="text-align:right">${Number((r.amount||0)+(r.tax||0)).toFixed(2)}</td></tr>`).join('')}
+    <tr><td colspan="5" style="text-align:right;border-top:1px solid #333;padding-top:4px"><strong>Total:</strong></td><td style="text-align:right;border-top:1px solid #333;padding-top:4px"><strong>HKD &nbsp; ${Number(totalAmt).toFixed(2)}</strong></td></tr>
     </tbody></table>`;}
 
   const notesText=notes||`Passengers are responsible for obtaining necessary travel documents, ensuring passports are valid for at least six months and securing required visas for the destination country.
@@ -1194,28 +1348,44 @@ function prvDoc(type,id){
     const inv=db.invoices.find(x=>x.id===id);
     const c=db.customers.find(x=>x.id===inv.cid);
     const o=inv.orderRef?db.orders.find(x=>x.no===inv.orderRef):null;
-    // Build pax list from booking or attn field
+    // Pax list
     let paxList=[];
     if(inv.attn) paxList=[inv.attn];
     else if(o&&o.pax&&o.pax.length) paxList=o.pax.map(p=>p.name).filter(Boolean);
-    // Build service rows from booking segments
+    // Service rows from booking segments
     let serviceRows=[];
+    let fareRows=[];
     if(o&&o.segs&&o.segs.length){
       o.segs.forEach(g=>{
         serviceRows.push({isHeader:true,label:g.type});
         g.segments.forEach(s=>{
-          const routing=s.dep&&s.dest?s.dep.toUpperCase()+'/'+s.dest.toUpperCase():'';
-          serviceRows.push({routing,date:s.depDate,time:'0:00',flight:s.flight||s.ref,cls:s.notes||'ECONOMY',status:'Confirmed'});
-          if(s.retDate) serviceRows.push({routing:(s.dest?s.dest.toUpperCase():'')+'/'+(s.dep?s.dep.toUpperCase():''),date:s.retDate,time:'0:00',flight:s.flight||s.ref,cls:s.notes||'ECONOMY',status:'Confirmed'});
+          const from=(s.dep||'').toUpperCase();
+          const to=(s.dest||'').toUpperCase();
+          if(g.type==='Flight'){
+            serviceRows.push({routing:from&&to?from+'/'+to:'—',date:s.depDate,time:s.depTime||'0:00',flight:s.flight||s.ref||'—',cls:s.cls||'ECONOMY',status:s.notes||'Confirmed'});
+            if(s.retDate) serviceRows.push({routing:to&&from?to+'/'+from:'—',date:s.retDate,time:'0:00',flight:s.flight||s.ref||'—',cls:s.cls||'ECONOMY',status:'Confirmed'});
+            // Fare rows from flight fares
+            if(s.fares){
+              const f=s.fares;
+              if(f.adtQty>0) fareRows.push({label:'Fare',unitPrice:(f.adt&&f.adt.fare||0),qty:f.adtQty,unit:'Adult',amount:(f.adt&&f.adt.fare||0)*f.adtQty,tax:(f.adt&&f.adt.tax||0)*f.adtQty});
+              if(f.chdQty>0) fareRows.push({label:'Fare',unitPrice:(f.chd&&f.chd.fare||0),qty:f.chdQty,unit:'Child',amount:(f.chd&&f.chd.fare||0)*f.chdQty,tax:(f.chd&&f.chd.tax||0)*f.chdQty});
+              if(f.infQty>0) fareRows.push({label:'Fare',unitPrice:(f.inf&&f.inf.fare||0),qty:f.infQty,unit:'Infant',amount:(f.inf&&f.inf.fare||0)*f.infQty,tax:(f.inf&&f.inf.tax||0)*f.infQty});
+            }
+          } else {
+            serviceRows.push({routing:from&&to?from+'/'+to:s.dest||'—',date:s.depDate,time:'',flight:s.ref||s.flight||'—',cls:'',status:s.notes||'Confirmed'});
+          }
         });
       });
     }
-    // Build fare rows from line items
-    const fareRows=(inv.lineItems||[]).map(li=>({label:'Fare',unitPrice:li.up||0,qty:li.qty,unit:li.unit||'Adult',amount:li.amt||0,desc:li.desc}));
+    // Fallback to line items if no segs
+    if(fareRows.length===0){
+      fareRows=(inv.lineItems||[]).map(li=>({label:'Fare',unitPrice:li.up||0,qty:li.qty,unit:li.unit||'Adult',amount:li.amt||0}));
+    }
+    const totalAmt=inv.amount;
     html=buildBMTDoc({type:'Invoice',no:inv.no,date:inv.date,dueDate:inv.dueDate,
       clientType:inv.clientType,clientName:c?c.name:'—',clientPhone:c?c.phone:'',
       attn:inv.attn,consultant:inv.consultant||'Mandy Lee',orderRef:inv.orderRef,
-      paxList,serviceRows,fareRows,totalAmt:inv.amount,paidAmt:inv.paid,
+      paxList,serviceRows,fareRows,totalAmt,paidAmt:inv.paid,
       status:inv.status==='paid'?'paid':'',notes:inv.notes});
   } else if(type==='REC'){
     const r=db.receipts.find(x=>x.id===id); const c=db.customers.find(x=>x.id===r.cid);
