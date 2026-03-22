@@ -297,7 +297,11 @@ tr.voided td{opacity:.5;text-decoration:line-through}
 <div class="main">
 <div class="topbar">
   <h2 id="page-title">Dashboard</h2>
-  <div id="topbar-actions" style="display:flex;gap:8px;align-items:center"></div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <div id="topbar-actions" style="display:flex;gap:8px;align-items:center"></div>
+    <button class="btn btn-outline btn-sm" onclick="exportBackup()" title="Download full backup">&#128190; Backup</button>
+    <label class="btn btn-outline btn-sm" style="cursor:pointer;margin:0" title="Restore from backup">&#128228; Restore<input type="file" accept=".json" onchange="importBackup(this)" style="display:none"></label>
+  </div>
 </div>
 <div class="content">
 
@@ -664,9 +668,41 @@ const REMARKS_DEFAULT = `Passengers are responsible for obtaining necessary trav
 // ═══════════════════════════════════════
 // DATABASE
 // ═══════════════════════════════════════
-function loadDB() {
-  const s = localStorage.getItem('bmt_v3');
-  if (s) return JSON.parse(s);
+// ═══════════════════════════════════════
+// SUPABASE CLOUD SYNC
+// ═══════════════════════════════════════
+const SUPA_URL = 'https://viwiakfivkcgenrbuukj.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpd2lha2ZpdmtjZ2VucmJ1dWtqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxOTM2ODcsImV4cCI6MjA4OTc2OTY4N30.kHZAm7_Z30FEqhlNWq6Ys2rsr1HZpTEsi0NriyB8PIk';
+
+async function supaLoad() {
+  try {
+    const res = await fetch(SUPA_URL+'/rest/v1/bmt_data?id=eq.main&select=data', {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer '+SUPA_KEY }
+    });
+    const rows = await res.json();
+    if (rows && rows[0] && rows[0].data && Object.keys(rows[0].data).length > 0) {
+      return rows[0].data;
+    }
+  } catch(e) { console.warn('Supabase load failed:', e); }
+  return null;
+}
+
+async function supaSave(data) {
+  try {
+    await fetch(SUPA_URL+'/rest/v1/bmt_data?id=eq.main', {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': 'Bearer '+SUPA_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ data: data, updated_at: new Date().toISOString() })
+    });
+  } catch(e) { console.warn('Supabase save failed:', e); }
+}
+
+function emptyDB() {
   return {
     clients: [], suppliers: [], bookings: [],
     invoices: [], receipts: [], creditnotes: [], debitnotes: [],
@@ -674,8 +710,20 @@ function loadDB() {
     ctr: { B:0, I:0, X:0, C:0, D:0, R:0, F:0, P:0, SUP:0 }
   };
 }
+
+function loadDB() {
+  const s = localStorage.getItem('bmt_v3');
+  if (s) return JSON.parse(s);
+  return emptyDB();
+}
 let DB = loadDB();
-function saveDB() { localStorage.setItem('bmt_v3', JSON.stringify(DB)); }
+
+let _saveTimer = null;
+function saveDB() {
+  localStorage.setItem('bmt_v3', JSON.stringify(DB));
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(() => supaSave(DB), 1500);
+}
 
 function nextNo(type) {
   DB.ctr[type]++;
@@ -2625,39 +2673,4 @@ function showHistory(clientId) {
   const invs=DB.invoices.filter(i=>i.clientId===clientId);
   const recs=DB.receipts.filter(r=>r.clientId===clientId);
   const cns=DB.creditnotes.filter(c=>c.clientId===clientId);
-  const dns=DB.debitnotes.filter(d=>d.clientId===clientId);
-  const rfs=DB.refunds.filter(r=>r.clientId===clientId);
-  let html = '<div>';
-  const item = (dot,ref,title,sub) => `<div class="hist-item"><div class="hist-dot" style="background:${dot}"></div><div><div style="font-family:var(--fm);font-size:11px;color:var(--teal)">${ref}</div><div style="font-size:12px;margin:2px 0">${title}</div><div style="font-size:11px;color:#999">${sub}</div></div></div>`;
-  bks.forEach(b=>{ html+=item('var(--teal)',b.no,b.desc||'Booking',`Status: ${b.status} | ${b.date} | ${(b.pax||[]).length} pax`); });
-  invs.forEach(i=>{ html+=item('var(--gold)',i.no,`Invoice — ${i.voided?'VOIDED':i.status}`,`${fmt(i.total)} | Received: ${fmt(i.paid)} | ${i.date}`); });
-  recs.forEach(r=>{ html+=item('var(--grn)',r.no,`Receipt — ${r.method}`,`${fmt(r.total)} | ${r.date}`); });
-  cns.forEach(c=>{ html+=item('var(--red)',c.no,`Credit Note — ${c.reason}`,`${fmt(c.amount)} | ${c.date}`); });
-  dns.forEach(d=>{ html+=item('var(--gd)',d.no,`Debit Note — ${d.reason}`,`${fmt(d.amount)} | ${d.date}`); });
-  rfs.forEach(r=>{ html+=item('var(--pur)',r.no,`Refund — ${r.status}`,`${fmt(r.total)} | ${r.reason} | ${r.date}`); });
-  if (!bks.length&&!invs.length) html+='<div class="empty">No transaction history</div>';
-  html+='</div>';
-  eid('history-body').innerHTML=html;
-  openModal('mo-history');
-}
-
-// ═══════════════════════════════════════
-// INITIALISE LOGO
-// ═══════════════════════════════════════
-function initLogo() {
-  // Logo will be injected by Python script
-  const logoEl = eid('LOGO');
-  const sbLogo = eid('sb-logo-img');
-  if (logoEl && logoEl.src && logoEl.src !== window.location.href) {
-    if (sbLogo) sbLogo.src = logoEl.src;
-  }
-}
-
-// ═══════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════
-initLogo();
-renderDashboard();
-</script>
-</body>
-</html>
+  const dns=DB.debitnotes.filter(d=>d.clientId===cli
