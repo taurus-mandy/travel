@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2673,4 +2673,196 @@ function showHistory(clientId) {
   const invs=DB.invoices.filter(i=>i.clientId===clientId);
   const recs=DB.receipts.filter(r=>r.clientId===clientId);
   const cns=DB.creditnotes.filter(c=>c.clientId===clientId);
-  const dns=DB.debitnotes.filter(d=>d.clientId===cli
+  const dns=DB.debitnotes.filter(d=>d.clientId===clientId);
+  const rfs=DB.refunds.filter(r=>r.clientId===clientId);
+  let html = '<div>';
+  const item = (dot,ref,title,sub) => `<div class="hist-item"><div class="hist-dot" style="background:${dot}"></div><div><div style="font-family:var(--fm);font-size:11px;color:var(--teal)">${ref}</div><div style="font-size:12px;margin:2px 0">${title}</div><div style="font-size:11px;color:#999">${sub}</div></div></div>`;
+  bks.forEach(b=>{ html+=item('var(--teal)',b.no,b.desc||'Booking',`Status: ${b.status} | ${b.date} | ${(b.pax||[]).length} pax`); });
+  invs.forEach(i=>{ html+=item('var(--gold)',i.no,`Invoice — ${i.voided?'VOIDED':i.status}`,`${fmt(i.total)} | Received: ${fmt(i.paid)} | ${i.date}`); });
+  recs.forEach(r=>{ html+=item('var(--grn)',r.no,`Receipt — ${r.method}`,`${fmt(r.total)} | ${r.date}`); });
+  cns.forEach(c=>{ html+=item('var(--red)',c.no,`Credit Note — ${c.reason}`,`${fmt(c.amount)} | ${c.date}`); });
+  dns.forEach(d=>{ html+=item('var(--gd)',d.no,`Debit Note — ${d.reason}`,`${fmt(d.amount)} | ${d.date}`); });
+  rfs.forEach(r=>{ html+=item('var(--pur)',r.no,`Refund — ${r.status}`,`${fmt(r.total)} | ${r.reason} | ${r.date}`); });
+  if (!bks.length&&!invs.length) html+='<div class="empty">No transaction history</div>';
+  html+='</div>';
+  eid('history-body').innerHTML=html;
+  openModal('mo-history');
+}
+
+// ═══════════════════════════════════════
+// BACKUP & RESTORE
+// ═══════════════════════════════════════
+function exportBackup() {
+  const now = new Date();
+  const ts = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+String(now.getMinutes()).padStart(2,'0');
+  const blob = new Blob([JSON.stringify(DB, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'BMT-Backup-' + ts + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  // Show success message
+  const msg = Object.assign(document.createElement('div'), {
+    style: 'position:fixed;bottom:20px;right:20px;background:var(--grn);color:#fff;padding:10px 16px;border-radius:5px;font-size:12px;font-family:var(--fm);z-index:999;font-weight:600',
+    textContent: '✓ Backup downloaded: BMT-Backup-' + ts + '.json'
+  });
+  document.body.appendChild(msg);
+  setTimeout(() => msg.remove(), 4000);
+}
+
+function importBackup(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (!confirm('Restore from backup? This will REPLACE all current data. Are you sure?')) {
+    input.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      // Validate it's a BMT backup
+      if (!data.clients || !data.bookings || !data.invoices) {
+        alert('Invalid backup file. Please select a valid BMT backup.');
+        return;
+      }
+      // Ensure ctr exists
+      if (!data.ctr) data.ctr = { B:0, I:0, X:0, C:0, D:0, R:0, F:0, P:0, SUP:0 };
+      DB = data;
+      saveDB();
+      // Also push to Supabase
+      const loader = Object.assign(document.createElement('div'), {
+        style: 'position:fixed;top:0;left:0;right:0;background:var(--gold);color:var(--ink);text-align:center;padding:8px;font-size:12px;font-family:var(--fm);z-index:999;font-weight:600',
+        textContent: 'Restoring backup and syncing to cloud...'
+      });
+      document.body.prepend(loader);
+      await supaSave(DB);
+      loader.remove();
+      renderDashboard();
+      // Navigate to dashboard
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.querySelector('[data-v="dashboard"]').classList.add('active');
+      document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+      eid('view-dashboard').classList.add('active');
+      eid('page-title').textContent = 'Dashboard';
+      alert('Backup restored successfully! ' + (data.clients||[]).length + ' clients, ' + (data.bookings||[]).length + ' bookings, ' + (data.invoices||[]).length + ' invoices.');
+    } catch(err) {
+      alert('Error reading backup file: ' + err.message);
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ═══════════════════════════════════════
+// INITIALISE LOGO
+// ═══════════════════════════════════════
+function initLogo() {
+  // Logo will be injected by Python script
+  const logoEl = eid('LOGO');
+  const sbLogo = eid('sb-logo-img');
+  if (logoEl && logoEl.src && logoEl.src !== window.location.href) {
+    if (sbLogo) sbLogo.src = logoEl.src;
+  }
+}
+
+// ═══════════════════════════════════════
+// BACKUP & RESTORE
+// ═══════════════════════════════════════
+function exportBackup() {
+  const now = new Date();
+  const ts = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+String(now.getMinutes()).padStart(2,'0');
+  const blob = new Blob([JSON.stringify(DB, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'BMT-Backup-' + ts + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  // Show success message
+  const msg = Object.assign(document.createElement('div'), {
+    style: 'position:fixed;bottom:20px;right:20px;background:var(--grn);color:#fff;padding:10px 16px;border-radius:5px;font-size:12px;font-family:var(--fm);z-index:999;font-weight:600',
+    textContent: '✓ Backup downloaded: BMT-Backup-' + ts + '.json'
+  });
+  document.body.appendChild(msg);
+  setTimeout(() => msg.remove(), 4000);
+}
+
+function importBackup(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (!confirm('Restore from backup? This will REPLACE all current data. Are you sure?')) {
+    input.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      // Validate it's a BMT backup
+      if (!data.clients || !data.bookings || !data.invoices) {
+        alert('Invalid backup file. Please select a valid BMT backup.');
+        return;
+      }
+      // Ensure ctr exists
+      if (!data.ctr) data.ctr = { B:0, I:0, X:0, C:0, D:0, R:0, F:0, P:0, SUP:0 };
+      DB = data;
+      saveDB();
+      // Also push to Supabase
+      const loader = Object.assign(document.createElement('div'), {
+        style: 'position:fixed;top:0;left:0;right:0;background:var(--gold);color:var(--ink);text-align:center;padding:8px;font-size:12px;font-family:var(--fm);z-index:999;font-weight:600',
+        textContent: 'Restoring backup and syncing to cloud...'
+      });
+      document.body.prepend(loader);
+      await supaSave(DB);
+      loader.remove();
+      renderDashboard();
+      // Navigate to dashboard
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.querySelector('[data-v="dashboard"]').classList.add('active');
+      document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+      eid('view-dashboard').classList.add('active');
+      eid('page-title').textContent = 'Dashboard';
+      alert('Backup restored successfully! ' + (data.clients||[]).length + ' clients, ' + (data.bookings||[]).length + ' bookings, ' + (data.invoices||[]).length + ' invoices.');
+    } catch(err) {
+      alert('Error reading backup file: ' + err.message);
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+initLogo();
+
+(async function initSync() {
+  const loader = Object.assign(document.createElement('div'), {
+    id: 'sync-loader',
+    textContent: 'Syncing with cloud...'
+  });
+  loader.style.cssText = 'position:fixed;top:0;left:0;right:0;background:var(--gold);color:var(--ink);text-align:center;padding:8px;font-size:12px;font-family:var(--fm);z-index:999;font-weight:600';
+  document.body.prepend(loader);
+  try {
+    const cloudData = await supaLoad();
+    if (cloudData && cloudData.clients) {
+      DB = cloudData;
+      if (!DB.ctr) DB.ctr = { B:0, I:0, X:0, C:0, D:0, R:0, F:0, P:0, SUP:0 };
+      localStorage.setItem('bmt_v3', JSON.stringify(DB));
+      loader.textContent = 'Cloud sync OK';
+    } else {
+      await supaSave(DB);
+      loader.textContent = 'Local data pushed to cloud';
+    }
+  } catch(e) {
+    loader.textContent = 'Offline mode - using local data';
+    console.warn('Sync error:', e);
+  }
+  setTimeout(() => loader.remove(), 2000);
+  renderDashboard();
+})();
+</script>
+</body>
+</html>
