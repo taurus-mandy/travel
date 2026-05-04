@@ -1372,12 +1372,7 @@ function openInvoiceModal(id) {
     </div>`;
   renderInvLI();
   if (inv?.bookingNo) { setTimeout(()=>{ eid('inv-booking').value=inv.bookingNo; autoFillInvoiceFromBooking(true); },50); }
-  // Always reset onclick to avoid stale edit ID from a previous edit session
-  if (id) {
-    eid('invoice-save-btn').onclick = () => saveInvoice(id);
-  } else {
-    eid('invoice-save-btn').onclick = () => saveInvoice(null);
-  }
+  if (id) eid('invoice-save-btn').onclick = () => saveInvoice(id);
   openModal('mo-invoice');
 }
 
@@ -1506,8 +1501,6 @@ function autoFillInvoiceFromBooking(silent) {
 }
 
 function saveInvoice(editId) {
-  // Guard against browser passing click Event as editId
-  if (editId && typeof editId !== 'string') editId = null;
   const clientId = eid('inv-client')?.value;
   if (!clientId) { alert('Please select a client'); return; }
   const sub = invLineItems.reduce((s,li)=>s+(li.amount||0), 0);
